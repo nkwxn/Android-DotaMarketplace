@@ -88,6 +88,9 @@ public class RegisterActivity extends AppCompatActivity implements View.OnClickL
         Cursor cUsernames = dbHelper.allUsernameData();
         cUsernames.moveToFirst();
         while (cUsernames.moveToNext()) {
+            if (registeredUsernames.size() == 0) {
+                cUsernames.moveToFirst();
+            }
             registeredUsernames.add(cUsernames.getString(0));
         }
         cUsernames.close();

@@ -44,8 +44,10 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
         registered = new ArrayList<>();
         ArrayList<String> user; // Urutan: UserID, Username, Password
         Cursor cUsers = dbHelper.allUsernameData();
-        cUsers.moveToFirst();
         while (cUsers.moveToNext()) {
+            if (registered.size() == 0) {
+                cUsers.moveToFirst();
+            }
             user = new ArrayList<>();
             user.add(cUsers.getString(2));
             user.add(cUsers.getString(0));
@@ -125,7 +127,11 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
         }
     }
 
-
+    @Override
+    protected void onResume() {
+        super.onResume();
+        initDatas();
+    }
 
     private boolean validateFilled(TextInputLayout til, EditText etx) {
         String username = etxUsername.getText().toString();
