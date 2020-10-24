@@ -26,7 +26,7 @@ public class SQLiteDBHelper extends SQLiteOpenHelper {
                                 user_balance = "Balance";
 
     // Nama column untuk tabel transaction
-    public static final String transaction_id = "UserID",
+    public static final String transaction_id = "TransactionID",
                                 transaction_user_id = "UserID",
                                 transaction_item_id = "ItemID",
                                 transaction_date = "TransactionDate";
@@ -94,19 +94,27 @@ public class SQLiteDBHelper extends SQLiteOpenHelper {
         sqLiteDatabase.execSQL("DROP TABLE IF EXISTS " + TABLE_ITEM);
     }
 
-    // method untuk memanggil semua data Items
+    // method untuk mendapatkan semua data Items
     public Cursor allItemsData() {
         Cursor c = database.rawQuery("SELECT * FROM " +
                 TABLE_ITEM, null);
         return c;
     }
 
-    // method untuk memanggil semua data History
+    // method untuk mendapatkan semua data History
     public Cursor allHistoryUserData(long UserID) {
         Cursor c = database.rawQuery("SELECT * FROM " +
                 TABLE_TRANSACTION + " WHERE "
                 + transaction_user_id + " = " +
                 UserID, null);
+        return c;
+    }
+
+    // method untuk mendapatkan semua data Username + password
+    public Cursor allUsernameData() {
+        Cursor c = database.rawQuery("SELECT " + user_username +
+                ", " + user_pwd + ", " + user_id +
+                " FROM " + TABLE_USER, null);
         return c;
     }
 

@@ -45,7 +45,7 @@ public class MainFormActivity extends AppCompatActivity {
 
         initComponents();
 
-        txtLoggedInUsername.setText(getIntent().getStringExtra("loginusername"));
+        txtLoggedInUsername.setText(getIntent().getStringExtra("user_id"));
         GameItemListRVAdapter rvAdapter = new GameItemListRVAdapter(this, itemsSold);
         rvItems.setHasFixedSize(true);
         rvItems.setAdapter(rvAdapter);

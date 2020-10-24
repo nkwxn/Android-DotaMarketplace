@@ -4,6 +4,7 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.database.Cursor;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
@@ -15,12 +16,18 @@ import android.widget.Toast;
 
 import com.google.android.material.textfield.TextInputLayout;
 
+import java.lang.reflect.Array;
+import java.util.ArrayList;
+
 public class LoginActivity extends AppCompatActivity implements View.OnClickListener {
     Button btnLogin, btnRegister;
     EditText etxUsername, etxPassword;
     TextInputLayout tilUsername, tilPassword;
-    SharedPreferences spref;
-    private final String FILE_NAME = "com.nicholas.dotamarketplace.UserDatas";
+
+    // Ini menggunakan SQLite
+    SQLiteDBHelper dbHelper;
+    ArrayList<ArrayList<String>> registered;
+    String user_id;
 
     private void initComponents() {
         btnLogin = findViewById(R.id.btnLogin);
@@ -29,6 +36,22 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
         etxPassword = findViewById(R.id.etxPassword);
         tilUsername = findViewById(R.id.tilUsername);
         tilPassword = findViewById(R.id.tilPassword);
+        dbHelper = new SQLiteDBHelper(LoginActivity.this);
+    }
+
+    // Import all registered user IDs
+    private void initDatas() {
+        registered = new ArrayList<>();
+        ArrayList<String> user; // Urutan: UserID, Username, Password
+        Cursor cUsers = dbHelper.allUsernameData();
+        cUsers.moveToFirst();
+        while (cUsers.moveToNext()) {
+            user = new ArrayList<>();
+            user.add(cUsers.getString(2));
+            user.add(cUsers.getString(0));
+            user.add(cUsers.getString(1));
+            registered.add(user);
+        }
     }
 
     @Override
@@ -37,6 +60,7 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
         setContentView(R.layout.activity_login);
 
         initComponents();
+        initDatas();
 
         btnLogin.setOnClickListener(this);
         btnRegister.setOnClickListener(this);
@@ -86,10 +110,8 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
                 boolean usrFilled = validateFilled(tilUsername, etxUsername);
                 boolean pwdFilled = validateFilled(tilPassword, etxPassword);
                 if (usrFilled  && pwdFilled) {
-                    String username = etxUsername.getText().toString();
-                    spref = getSharedPreferences(FILE_NAME, MODE_PRIVATE);
                     Intent i = new Intent(getApplicationContext(), MainFormActivity.class);
-                    i.putExtra("loginusername", username);
+                    i.putExtra("user_id", user_id);
                     startActivity(i);
                     this.finish();
                 } else {
@@ -103,20 +125,33 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
         }
     }
 
-    private boolean validateFilled(TextInputLayout til, EditText etx) {
 
-        // SharedPreference get untuk mendapatkan data login
-        spref = getSharedPreferences(FILE_NAME, MODE_PRIVATE);
-        String username = etxUsername.getText().toString(),
-                password = etxPassword.getText().toString();
-        String savedusername = spref.getString("username", "");
-        String savedpassword = spref.getString("password", "");
+
+    private boolean validateFilled(TextInputLayout til, EditText etx) {
+        String username = etxUsername.getText().toString();
+        String pwd = etxPassword.getText().toString();
+        boolean valusername = false,
+                valpassword = false;
+
+        // Looping untuk mendapatkan data username dan password
+        for (int i = 0; i < registered.size(); i++) {
+            ArrayList<String> x = registered.get(i);
+            // validate username
+            if (username.equals(x.get(1))) {
+                valusername = true;
+                // validate password after username
+                if (pwd.equals(x.get(2))) {
+                    valpassword = true;
+                    user_id = x.get(0);
+                }
+                break;
+            }
+        }
 
         if (etx.getText().toString().equals("")) {
             til.setError("must be filled");
             return false;
         } else if (etx.getId() == etxUsername.getId()) {
-            boolean valusername = username.equals(savedusername);
             if (!valusername) {
                 til.setError("not registered");
                 return false;
@@ -125,9 +160,8 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
                 return true;
             }
         } else if (etx.getId() == etxPassword.getId()) {
-            boolean valpassword = password.equals(savedpassword);
             if (!valpassword) {
-                til.setError("incorrect");
+                til.setError("not valid");
                 return false;
             } else {
                 til.setError(null);

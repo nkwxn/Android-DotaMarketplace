@@ -5,7 +5,7 @@ import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.ContentValues;
-import android.content.SharedPreferences;
+import android.database.Cursor;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
@@ -21,6 +21,7 @@ import android.widget.Toast;
 
 import com.google.android.material.textfield.TextInputLayout;
 
+import java.util.ArrayList;
 import java.util.StringTokenizer;
 
 public class RegisterActivity extends AppCompatActivity implements View.OnClickListener {
@@ -33,11 +34,7 @@ public class RegisterActivity extends AppCompatActivity implements View.OnClickL
     RadioButton rbMale, rbFemale;
     CheckBox chkAgreement;
     SQLiteDBHelper dbHelper;
-
-    // Ini dihapus saja setelah ada SQLite Adapter
-    SharedPreferences spref;
-    SharedPreferences.Editor editor;
-    private final String FILE_NAME = "com.nicholas.dotamarketplace.UserDatas";
+    ArrayList<String> registeredUsernames = new ArrayList<>();
 
     private void initComponents() {
         // Initialize Action Bar's text and back button
@@ -70,6 +67,8 @@ public class RegisterActivity extends AppCompatActivity implements View.OnClickL
 
         btnClear = findViewById(R.id.btnClear);
         btnRegister = findViewById(R.id.btnRegister);
+
+        dbHelper = new SQLiteDBHelper(this);
     }
 
     @Override
@@ -84,6 +83,14 @@ public class RegisterActivity extends AppCompatActivity implements View.OnClickL
         rbMale.setOnClickListener(this);
         rbFemale.setOnClickListener(this);
         chkAgreement.setOnClickListener(this);
+
+        // Cursor to get registered username data
+        Cursor cUsernames = dbHelper.allUsernameData();
+        cUsernames.moveToFirst();
+        while (cUsernames.moveToNext()) {
+            registeredUsernames.add(cUsernames.getString(0));
+        }
+        cUsernames.close();
 
         etxFullName.addTextChangedListener(new TextWatcher() {
             @Override
@@ -200,9 +207,18 @@ public class RegisterActivity extends AppCompatActivity implements View.OnClickL
                 boolean vPhone = validateFilled(tilPhone, etxPhone);
                 boolean genderChecked = rbMale.isChecked() || rbFemale.isChecked();
                 boolean agreementChecked = chkAgreement.isChecked();
-                dbHelper = new SQLiteDBHelper(getApplicationContext());
-                if (!genderChecked) {
+                int checkedGender = rgGender.getCheckedRadioButtonId();
+                String strChkGend = "";
+
+                if (checkedGender == -1) {
                     txtGenderError.setVisibility(View.VISIBLE);
+                } else {
+                    if (checkedGender == rbMale.getId()) {
+                        strChkGend = rbMale.getText().toString();
+                    }
+                    if (checkedGender == rbFemale.getId()) {
+                        strChkGend = rbFemale.getText().toString();
+                    }
                 }
                 if (!agreementChecked) {
                     txtAgreementError.setVisibility(View.VISIBLE);
@@ -210,21 +226,21 @@ public class RegisterActivity extends AppCompatActivity implements View.OnClickL
                 // When user clicks the register button and everything validated as true, save and redir to login
                 if (vName && vUsername && vPwd && vCPwd && vPhone && genderChecked && agreementChecked) {
                     String name = etxFullName.getText().toString(),
+                            gender = strChkGend,
                             username = etxUsername.getText().toString(),
-                            password = etxPwd.getText().toString();
+                            password = etxPwd.getText().toString(),
+                            phone_number = etxPhone.getText().toString();
 
                     // Memasukkan data user kedalam sqlite database
                     ContentValues cvUser = new ContentValues();
                     cvUser.put(dbHelper.user_name, name);
+                    cvUser.put(dbHelper.user_username, username);
+                    cvUser.put(dbHelper.user_pwd, password);
+                    cvUser.put(dbHelper.user_phone_num, phone_number);
+                    cvUser.put(dbHelper.user_gender, gender);
+                    cvUser.put(dbHelper.user_balance, 0);
                     dbHelper.insertUserData(cvUser);
-
-                    // Shared preferences yang harus dihapuskan karena sudah selesai tugasnya
-                    spref = getSharedPreferences(FILE_NAME, MODE_PRIVATE);
-                    editor = spref.edit();
-                    editor.putString("username", username);
-                    editor.putString("password", password);
-                    editor.commit();
-                    Toast.makeText(this, "User registration recorded as " + spref.getString("username", ""), Toast.LENGTH_SHORT).show();
+                    Toast.makeText(this, "User Registered", Toast.LENGTH_SHORT).show();
                     this.finish();
                 } else {
                     Toast.makeText(this, "Please check all the required fields!", Toast.LENGTH_SHORT).show();
@@ -277,18 +293,23 @@ public class RegisterActivity extends AppCompatActivity implements View.OnClickL
             til.setErrorEnabled(true);
             boolean valUsrnmLength = username.length() < 5 || username.length() > 25;
             boolean usrnContainSpace = username.contains(" ");
+            boolean usrnRegistered = false;
 
-            // tambahkan validasi dari basis data SQLite (jika user id tertentu sudah terdaftar)
-            // Untuk saat ini gunakan SharedPreferences untuk username dan password
-            spref = getPreferences(MODE_PRIVATE);
-            String regousername = spref.getString("username", "");
+            // Looping dengan username terdaftar di SQLite Database
+            for (int i = 0; i < registeredUsernames.size(); i++) {
+                if (username.equals(registeredUsernames.get(i))) {
+                    usrnRegistered = true;
+                    break;
+                }
+            }
+
             if (valUsrnmLength) {
                 til.setError("must be between 5 and 25 characters long");
                 return false;
             } else if (usrnContainSpace) {
                 til.setError("cannot contain space");
                 return false;
-            } else if (regousername.equals(username)) {
+            } else if (usrnRegistered) {
                 tilUsername.setError("has to be unique");
                 return false;
             } else {
