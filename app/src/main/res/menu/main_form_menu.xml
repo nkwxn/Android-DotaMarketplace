@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <item android:title="Top up"
+        android:id="@+id/miTopUp"/>
+    <item android:title="History"
+        android:id="@+id/miHistory"/>
+    <item android:title="Log out"
+        android:id="@+id/miLogOut"/>
+</menu>

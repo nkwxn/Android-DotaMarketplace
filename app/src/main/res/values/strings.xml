@@ -1,0 +1,19 @@
+<resources>
+    <string name="app_name">Dota Marketplace</string>
+    <string name="dm_login">Login</string>
+    <string name="dm_username">Username</string>
+    <string name="dm_password">Password</string>
+    <string name="dm_confirm_password">Confirm Password</string>
+    <string name="dm_phone_num">Phone Number</string>
+    <string name="dm_register">Register</string>
+    <string name="dm_full_name">Full Name</string>
+    <string name="dm_gender">Gender</string>
+    <string name="dm_gender_male">Male</string>
+    <string name="dm_gender_female">Female</string>
+    <string name="dm_clear_all">Clear all fields</string>
+    <string name="dm_mb_selected">must be selected</string>
+    <string name="dm_err_chk">Agreement must be checked</string>
+    <string name="dm_agree_to">I agree to the terms &amp; conditions</string>
+    <string name="dm_clear_history">Clear History</string>
+    <string name="dm_history">History</string>
+</resources>

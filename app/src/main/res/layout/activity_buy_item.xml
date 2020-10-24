@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    tools:context=".BuyItemActivity">
+    <ImageView
+        android:id="@+id/imgItemB"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:scaleType="centerCrop"
+        android:src="@drawable/ic_image_container"/>
+    <TextView
+        android:id="@+id/txtitemNameB"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginHorizontal="10dp"
+        android:layout_marginTop="10dp"
+        android:text="Item Name"
+        android:textSize="26dp"
+        android:textColor="@color/colorOnBackground"/>
+    <TextView
+        android:id="@+id/txtItemPriceB"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginHorizontal="10dp"
+        android:text="Price: Rp 200000"/>
+    <TextView
+        android:id="@+id/txtItemStockB"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginHorizontal="10dp"
+        android:text="Stock: 200" />
+    <com.google.android.material.textfield.TextInputLayout
+        android:id="@+id/tilQty"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginHorizontal="10dp"
+        android:layout_marginTop="10dp"
+        app:helperText=" "
+        style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox">
+        <EditText
+            android:id="@+id/etxQty"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Quantity"
+            android:inputType="number"/>
+    </com.google.android.material.textfield.TextInputLayout>
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="10dp"
+        android:gravity="right">
+        <Button
+            android:id="@+id/btnLocation"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Show seller location"
+            style="@style/Widget.MaterialComponents.Button.TextButton" />
+        <Button
+            android:id="@+id/btnCheckOut"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Check out"
+            android:layout_marginHorizontal="10dp"
+            style="@style/Widget.MaterialComponents.Button" />
+    </LinearLayout>
+</LinearLayout>
