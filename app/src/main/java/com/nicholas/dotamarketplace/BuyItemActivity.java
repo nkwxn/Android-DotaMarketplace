@@ -3,22 +3,39 @@ package com.nicholas.dotamarketplace;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.coordinatorlayout.widget.CoordinatorLayout;
+import androidx.core.widget.NestedScrollView;
 
 import android.content.Intent;
+import android.content.res.Resources;
 import android.os.Bundle;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.ViewTreeObserver;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.android.material.appbar.AppBarLayout;
+import com.google.android.material.appbar.CollapsingToolbarLayout;
+import com.google.android.material.appbar.MaterialToolbar;
 import com.google.android.material.textfield.TextInputLayout;
 
+import java.util.StringTokenizer;
+
 public class BuyItemActivity extends AppCompatActivity implements View.OnClickListener {
-    ActionBar actionBar;
-    TextView txtItemName, txtItemPrice, txtItemStock;
+    CoordinatorLayout parentV;
+    AppBarLayout abl;
+    CollapsingToolbarLayout toolbar;
+    MaterialToolbar mtb;
+    NestedScrollView nsv;
+    LinearLayout llFields;
+    TextView txtItemName, txtItemPrice, txtItemStock, txtTotalPrice;
     EditText etxQty;
     TextInputLayout tilQty;
     ImageView img;
@@ -27,10 +44,16 @@ public class BuyItemActivity extends AppCompatActivity implements View.OnClickLi
     Bundle b;
 
     private void initLayout() {
-        actionBar = getSupportActionBar();
+        parentV = findViewById(R.id.parentLayout);
+        abl = findViewById(R.id.appBarLayout);
+        toolbar = findViewById(R.id.toolBarItemName);
+        mtb = findViewById(R.id.toolbar);
+        nsv = findViewById(R.id.nsv);
+        llFields = findViewById(R.id.layoutFields);
         txtItemName = findViewById(R.id.txtitemNameB);
         txtItemPrice = findViewById(R.id.txtItemPriceB);
         txtItemStock = findViewById(R.id.txtItemStockB);
+        txtTotalPrice = findViewById(R.id.txtTotalPriceB);
         img = findViewById(R.id.imgItemB);
         etxQty = findViewById(R.id.etxQty);
         tilQty = findViewById(R.id.tilQty);
@@ -45,24 +68,62 @@ public class BuyItemActivity extends AppCompatActivity implements View.OnClickLi
 
         initLayout();
 
-        // Set action bar back button to close
-        actionBar.setDisplayHomeAsUpEnabled(true);
-        actionBar.setHomeAsUpIndicator(R.drawable.ic_close);
-        actionBar.setTitle("Buy Item");
-
         b = getIntent().getExtras();
-        String itemName = b.getString("itemName");
+        String itemFullName = b.getString("itemName");
         itemPrice = b.getInt("itemPrice", 0);
         itemStock = b.getInt("itemStock", 0);
 
-        txtItemName.setText(itemName);
-        txtItemPrice.setText("Price: Rp " + itemPrice);
+        StringTokenizer namecatseparator = new StringTokenizer(itemFullName, "(");
+        String itemName = namecatseparator.nextToken();
+        String itemDesc = namecatseparator.nextToken();
+        itemDesc = itemDesc.substring(0, itemDesc.length() - 1);
+
+        toolbar.setTitle(itemName);
+        mtb.setNavigationIcon(R.drawable.ic_close);
+        mtb.setNavigationOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                onBackPressed();
+            }
+        });
+
+        txtItemName.setText(itemDesc);
+        txtItemPrice.setText("Price per unit: Rp " + itemPrice);
         txtItemStock.setText("Stock: " + itemStock);
+
+        abl.getLayoutParams().height = getScreenHeight() - getHeightOfView(llFields);
 
         resID = b.getInt("itemImg");
         img.setImageResource(resID);
         btnLoc.setOnClickListener(this);
         btnCheckout.setOnClickListener(this);
+
+        etxQty.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+                String qty = etxQty.getText().toString();
+                int itemTotalPrice;
+                if (qty.length() == 0) {
+                    itemTotalPrice = 0;
+                } else {
+                    itemTotalPrice = itemPrice * Integer.parseInt(qty);
+                }
+                txtTotalPrice.setText("Rp " + itemTotalPrice);
+                if (tilQty.isErrorEnabled()) {
+                    validateFilled(tilQty, etxQty);
+                }
+            }
+
+            @Override
+            public void afterTextChanged(Editable editable) {
+
+            }
+        });
     }
 
     @Override
@@ -75,6 +136,15 @@ public class BuyItemActivity extends AppCompatActivity implements View.OnClickLi
             default:
                 return super.onOptionsItemSelected(item);
         }
+    }
+
+    private int getHeightOfView(View v) {
+        v.measure(View.MeasureSpec.UNSPECIFIED, View.MeasureSpec.UNSPECIFIED);
+        return v.getMeasuredHeight();
+    }
+
+    public int getScreenHeight() {
+        return Resources.getSystem().getDisplayMetrics().heightPixels;
     }
 
     @Override

@@ -3,8 +3,10 @@ package com.nicholas.dotamarketplace;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+import androidx.recyclerview.widget.StaggeredGridLayoutManager;
 
 import android.content.Intent;
 import android.content.res.Resources;
@@ -51,7 +53,12 @@ public class MainFormActivity extends AppCompatActivity {
         txtLoggedInUsername.setText(username);
         txtLoggedInBalance.setText("Rp " + balance);
 
-        Cursor itemInfo; // yang ini nanti aja buat data + validate json service
+        ArrayList<GameItem> items = new ArrayList<>();
+        Cursor itemInfo = dbHelper.allItemsData(); // yang ini nanti aja buat data + validate json service
+        itemInfo.moveToFirst();
+        while (itemInfo.moveToNext()) {
+//            if ()
+        }
     }
 
     @Override
@@ -62,22 +69,12 @@ public class MainFormActivity extends AppCompatActivity {
         initComponents();
         initDatas();
 
+        // List View Adapter + kawan2 nya dari sini
         GameItemListRVAdapter rvAdapter = new GameItemListRVAdapter(this, itemsSold);
-        rvItems.setHasFixedSize(true);
+        StaggeredGridLayoutManager sglm = new StaggeredGridLayoutManager(2, StaggeredGridLayoutManager.VERTICAL);
         rvItems.setAdapter(rvAdapter);
-        LinearLayoutManager llm = new LinearLayoutManager(this);
-        llm.setOrientation(LinearLayoutManager.VERTICAL);
-        rvItems.setLayoutManager(llm);
-
-        rvItems.addItemDecoration(new SpacesItemDecoration(dpToPx(10)));
-    }
-
-    public static int dpToPx(int dp) {
-        return (int) (dp * Resources.getSystem().getDisplayMetrics().density);
-    }
-
-    public static int pxToDp(int px) {
-        return (int) (px / Resources.getSystem().getDisplayMetrics().density);
+        rvItems.setLayoutManager(sglm);
+        rvItems.addItemDecoration(new SpacesItemDecoration(10, 0));
     }
 
     @Override

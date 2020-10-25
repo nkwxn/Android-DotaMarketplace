@@ -54,7 +54,7 @@ public class TransactionHistoryActivity extends AppCompatActivity {
         llm.setOrientation(LinearLayoutManager.VERTICAL);
         rvHistory.setLayoutManager(llm);
 
-        rvHistory.addItemDecoration(new SpacesItemDecoration(dpToPx(76)));
+        rvHistory.addItemDecoration(new SpacesItemDecoration(76, 1));
 
         btnClear.setOnClickListener(new View.OnClickListener() {
             @Override

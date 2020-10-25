@@ -17,6 +17,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.google.android.material.card.MaterialCardView;
 
 import java.util.ArrayList;
+import java.util.StringTokenizer;
 
 public class GameItemListRVAdapter extends RecyclerView.Adapter<GameItemListRVAdapter.ViewHolder> {
     public Context c;
@@ -40,17 +41,23 @@ public class GameItemListRVAdapter extends RecyclerView.Adapter<GameItemListRVAd
         int resID;
         final String itemId = itemV.getItemID();
         final String userId = itemV.getUserID();
-        final String itemName = itemV.getName();
+        final String itemFullName = itemV.getName();
         final int itemPrice = itemV.getPrice();
         final int itemStock = itemV.getStock();
         final double latitude = itemV.getLatitude();
         final double longitude = itemV.getLongitude();
 
-        holder.txtItemName.setText(itemName);
-        holder.txtItemPrice.setText("Price: Rp " + itemPrice);
-        holder.txtItemQty.setText("Stock: " + itemStock);
+        StringTokenizer namecatseparator = new StringTokenizer(itemFullName, "(");
+        String itemName = namecatseparator.nextToken();
+        String itemDesc = namecatseparator.nextToken();
+        itemDesc = itemDesc.substring(0, itemDesc.length() - 1);
 
-        switch (itemName) {
+        holder.txtItemName.setText(itemName);
+        holder.txtItemDesc.setText(itemDesc);
+        holder.txtItemPrice.setText("Rp " + itemPrice);
+        holder.txtItemQty.setText("" + itemStock);
+
+        switch (itemFullName) {
             case "Inscribed Demon Eater (Arcana Shadow Fiend)":
                 resID = R.drawable.demon_eater;
                 break;
@@ -80,7 +87,7 @@ public class GameItemListRVAdapter extends RecyclerView.Adapter<GameItemListRVAd
                 Bundle b = new Bundle();
                 b.putString("itemId", itemId);
                 b.putString("userId", userId);
-                b.putString("itemName", itemName);
+                b.putString("itemName", itemFullName);
                 b.putInt("itemPrice", itemPrice);
                 b.putInt("itemStock", itemStock);
                 b.putDouble("itemLattd", longitude);
@@ -102,7 +109,7 @@ public class GameItemListRVAdapter extends RecyclerView.Adapter<GameItemListRVAd
     class ViewHolder extends RecyclerView.ViewHolder {
         MaterialCardView mcvRVA;
         ImageView img;
-        TextView txtItemName, txtItemPrice, txtItemQty;
+        TextView txtItemName, txtItemDesc, txtItemPrice, txtItemQty;
         Button btnBuy;
 
         public ViewHolder(@NonNull View itemView) {
@@ -110,6 +117,7 @@ public class GameItemListRVAdapter extends RecyclerView.Adapter<GameItemListRVAd
             mcvRVA = itemView.findViewById(R.id.mcvRVA);
             img = itemView.findViewById(R.id.imgIcon);
             txtItemName = itemView.findViewById(R.id.txtItemName);
+            txtItemDesc = itemView.findViewById(R.id.txtItemDesc);
             txtItemPrice = itemView.findViewById(R.id.txtItemPrice);
             txtItemQty = itemView.findViewById(R.id.txtItemStock);
             btnBuy = itemView.findViewById(R.id.btnBuyItem);
