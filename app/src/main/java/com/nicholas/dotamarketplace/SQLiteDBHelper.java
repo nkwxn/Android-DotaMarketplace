@@ -120,7 +120,7 @@ public class SQLiteDBHelper extends SQLiteOpenHelper {
 
     // method untuk mendapatkan Username dan Balance setelah user login
     public Cursor getUsernameBalance(long UserID) {
-        Cursor c = database.rawQuery("SELECT " + user_username + ", " + user_balance +
+        Cursor c = database.rawQuery("SELECT " + user_username + ", " + user_balance + ", " + user_pwd +
                 " FROM " + TABLE_USER + " WHERE " + user_id + " = " + UserID, null);
         return c;
     }
@@ -128,6 +128,11 @@ public class SQLiteDBHelper extends SQLiteOpenHelper {
     // method untuk memasukkan data user (sign up)
     public void insertUserData(ContentValues cv) {
         database.insert(TABLE_USER, null, cv);
+    }
+
+    // method untuk memperbarui saldo dompet
+    public void updateUserBalance(ContentValues cv, long userID) {
+        database.update(TABLE_USER, cv, user_id + " = " + userID, null);
     }
 
     // method untuk memasukkan data transaksi dan update stock dari inventory

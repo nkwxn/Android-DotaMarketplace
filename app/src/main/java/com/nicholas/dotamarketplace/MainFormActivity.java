@@ -28,6 +28,7 @@ public class MainFormActivity extends AppCompatActivity {
     RecyclerView rvItems;
     ArrayList<GameItem> itemsSold = new ArrayList<>();
     SQLiteDBHelper dbHelper;
+    long UserID;
 
     private void initComponents() {
         actionBar = getSupportActionBar();
@@ -45,7 +46,7 @@ public class MainFormActivity extends AppCompatActivity {
 
     private void initDatas() {
         // Set Username and Balance to TextView
-        long UserID = Long.parseLong(getIntent().getStringExtra("user_id"));
+        UserID = Long.parseLong(getIntent().getStringExtra("user_id"));
         Cursor userInfo = dbHelper.getUsernameBalance(UserID);
         userInfo.moveToFirst();
         String username = userInfo.getString(0);
@@ -95,10 +96,12 @@ public class MainFormActivity extends AppCompatActivity {
         switch (item.getItemId()) {
             case R.id.miTopUp:
                 Intent i = new Intent(getApplicationContext(), TopUpActivity.class);
+                i.putExtra("user_id", UserID);
                 startActivity(i);
                 break;
             case R.id.miHistory:
                 Intent j = new Intent(getApplicationContext(), TransactionHistoryActivity.class);
+                j.putExtra("user_id", UserID);
                 startActivity(j);
                 break;
             case R.id.miLogOut:

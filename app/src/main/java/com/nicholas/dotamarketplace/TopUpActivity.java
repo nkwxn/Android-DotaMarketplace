@@ -4,7 +4,9 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.content.ContentValues;
 import android.content.SharedPreferences;
+import android.database.Cursor;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
@@ -23,8 +25,9 @@ public class TopUpActivity extends AppCompatActivity {
     EditText etxTopUpAmt, etxPwd;
     TextInputLayout tilTopUpAmt, tilPwd;
     Button btnAddBal;
-    SharedPreferences spref;
-    private final String FILE_NAME = "com.nicholas.dotamarketplace.UserDatas";
+    SQLiteDBHelper dbHelper;
+    long UserID;
+    String usrpwd, balance;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -32,6 +35,7 @@ public class TopUpActivity extends AppCompatActivity {
         setContentView(R.layout.activity_top_up);
 
         initUI();
+        initDatas();
 
         actionBar.setDisplayHomeAsUpEnabled(true);
         actionBar.setTitle("Top up");
@@ -44,8 +48,16 @@ public class TopUpActivity extends AppCompatActivity {
                 boolean valTUAmt = validateFilled(tilTopUpAmt, etxTopUpAmt);
                 boolean valPwd = validateFilled(tilPwd, etxPwd);
                 if (valTUAmt && valPwd) {
-                    Toast.makeText(TopUpActivity.this, "Balance has been added by Rp " + etxTopUpAmt.getText().toString(), Toast.LENGTH_SHORT).show();
                     // Update query goes here
+                    int bal = Integer.parseInt(balance);
+                    int add = Integer.parseInt(etxTopUpAmt.getText().toString());
+                    ContentValues cv = new ContentValues();
+                    cv.put(dbHelper.user_balance, (bal + add) + "");
+                    dbHelper.updateUserBalance(cv, UserID);
+
+                    initDatas();
+
+                    Toast.makeText(TopUpActivity.this, "Balance has been added by Rp " + add, Toast.LENGTH_SHORT).show();
                 }
             }
         });
@@ -97,7 +109,16 @@ public class TopUpActivity extends AppCompatActivity {
         tilPwd = findViewById(R.id.tilPasswordTU);
         btnAddBal = findViewById(R.id.btnAddBalance);
 
-        spref = getSharedPreferences(FILE_NAME, MODE_PRIVATE);
+        dbHelper = new SQLiteDBHelper(this);
+    }
+
+    private void initDatas() {
+        UserID = getIntent().getLongExtra("user_id", 0);
+        Cursor userInfo = dbHelper.getUsernameBalance(UserID);
+        userInfo.moveToFirst();
+        balance = userInfo.getString(1);
+        usrpwd = userInfo.getString(2);
+        txtUserBalance.setText("Rp " + balance);
     }
 
     @Override
@@ -126,12 +147,12 @@ public class TopUpActivity extends AppCompatActivity {
             }
         } else if (etx.getId() == etxPwd.getId()) {
             String pwd = etxPwd.getText().toString();
-            String svdpwd = spref.getString("password", "");
+            String svdpwd = usrpwd;
             if (pwd.equals(svdpwd)) {
                 til.setError(null);
                 return true;
             } else {
-                til.setError("incorrect");
+                til.setError("not valid");
                 return false;
             }
         } else {
