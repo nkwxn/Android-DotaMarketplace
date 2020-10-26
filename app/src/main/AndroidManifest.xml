@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.nicholas.dotamarketplace">
-
     <application
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
@@ -9,11 +8,16 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".TransactionHistoryActivity"></activity>
+        <activity
+            android:name=".SellerLocationMapsActivity"
+            android:label="@string/title_activity_seller_location_maps"></activity>
+
+        <activity android:name=".TransactionHistoryActivity" />
         <activity android:name=".SellerLocationActivity" />
         <activity android:name=".TopUpActivity" />
-        <activity android:name=".BuyItemActivity"
-            android:theme="@style/AppTheme.NoActionBar"/>
+        <activity
+            android:name=".BuyItemActivity"
+            android:theme="@style/AppTheme.NoActionBar" />
         <activity android:name=".MainFormActivity" />
         <activity android:name=".RegisterActivity" />
         <activity android:name=".LoginActivity">
@@ -23,6 +27,12 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+        <meta-data
+            android:name="com.google.android.geo.API_KEY"
+            android:value="@string/google_maps_key" />
     </application>
+
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+    <uses-permission android:name="android.permission.INTERNET" />
 
 </manifest>

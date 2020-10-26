@@ -1,6 +1,9 @@
 package com.nicholas.dotamarketplace;
 
-public class GameItem {
+import android.os.Parcel;
+import android.os.Parcelable;
+
+public class GameItem implements Parcelable {
     private String itemID, userID, name;
     private int price, stock;
     private double latitude, longitude;
@@ -14,6 +17,28 @@ public class GameItem {
         this.latitude = latitude;
         this.longitude = longitude;
     }
+
+    protected GameItem(Parcel in) {
+        itemID = in.readString();
+        userID = in.readString();
+        name = in.readString();
+        price = in.readInt();
+        stock = in.readInt();
+        latitude = in.readDouble();
+        longitude = in.readDouble();
+    }
+
+    public static final Creator<GameItem> CREATOR = new Creator<GameItem>() {
+        @Override
+        public GameItem createFromParcel(Parcel in) {
+            return new GameItem(in);
+        }
+
+        @Override
+        public GameItem[] newArray(int size) {
+            return new GameItem[size];
+        }
+    };
 
     public String getItemID() {
         return itemID;
@@ -69,5 +94,21 @@ public class GameItem {
 
     public void setUserID(String userID) {
         this.userID = userID;
+    }
+
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    @Override
+    public void writeToParcel(Parcel parcel, int i) {
+        parcel.writeString(this.itemID);
+        parcel.writeString(this.itemID);
+        parcel.writeString(this.itemID);
+        parcel.writeInt(this.price);
+        parcel.writeInt(this.stock);
+        parcel.writeDouble(this.latitude);
+        parcel.writeDouble(this.longitude);
     }
 }

@@ -41,6 +41,8 @@ public class BuyItemActivity extends AppCompatActivity implements View.OnClickLi
     ImageView img;
     Button btnLoc, btnCheckout;
     int itemPrice, itemStock, resID;
+    double latd, longtd;
+    String userId, itemId;
     Bundle b;
 
     private void initLayout() {
@@ -72,6 +74,10 @@ public class BuyItemActivity extends AppCompatActivity implements View.OnClickLi
         String itemFullName = b.getString("itemName");
         itemPrice = b.getInt("itemPrice", 0);
         itemStock = b.getInt("itemStock", 0);
+        longtd = b.getDouble("itemLongtd", 0);
+        latd = b.getDouble("itemLattd", 0);
+        userId = b.getString("userId");
+        itemId = b.getString("itemId");
 
         StringTokenizer namecatseparator = new StringTokenizer(itemFullName, "(");
         String itemName = namecatseparator.nextToken();
@@ -93,7 +99,7 @@ public class BuyItemActivity extends AppCompatActivity implements View.OnClickLi
 
         abl.getLayoutParams().height = getScreenHeight() - getHeightOfView(llFields);
 
-        resID = b.getInt("itemImg");
+        resID = getIntent().getIntExtra("itemImg", 0);
         img.setImageResource(resID);
         btnLoc.setOnClickListener(this);
         btnCheckout.setOnClickListener(this);
@@ -151,15 +157,13 @@ public class BuyItemActivity extends AppCompatActivity implements View.OnClickLi
     public void onClick(View view) {
         switch (view.getId()) {
             case R.id.btnLocation:
-                Intent i = new Intent(getApplicationContext(), SellerLocationActivity.class);
-                i.putExtra("long", b.getDouble("itemLongtd", 0));
-                i.putExtra("lat", b.getDouble("itemLattd", 0));
+                Intent i = new Intent(getApplicationContext(), SellerLocationMapsActivity.class);
+                i.putExtra("long", latd );
+                i.putExtra("lat", longtd);
                 startActivity(i);
                 break;
             case R.id.btnCheckOut:
                 boolean valQty = validateFilled(tilQty, etxQty);
-                String userId = b.getString("userId"); // String digunakan untuk merecord transaksi
-                String itemId = b.getString("itemId");
                 if (valQty) {
                     Toast.makeText(this, "Transaction recorded", Toast.LENGTH_SHORT).show();
                     BuyItemActivity.this.finish();

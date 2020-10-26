@@ -94,6 +94,8 @@ public class GameItemListRVAdapter extends RecyclerView.Adapter<GameItemListRVAd
                 b.putDouble("itemLongtd", latitude);
                 b.putInt("itemImg", resIDx);
                 i.putExtras(b);
+                i.putExtra("gameItem", itemV);
+                i.putExtra("itemImg", resIDx);
                 c.startActivity(i);
             }
         });

@@ -38,9 +38,9 @@ public class MainFormActivity extends AppCompatActivity {
         dbHelper = new SQLiteDBHelper(this);
 
         itemsSold.add(new GameItem("ITM001", "01", "Inscribed Demon Eater (Arcana Shadow Fiend)", 263300, 515, 14.604847, 13.886719));
-        itemsSold.add(new GameItem("ITM002", "01", "Blades of Voth Domosh (Arcana Legion Commander)", 300300, 4, 14.604847, 13.886719));
+        itemsSold.add(new GameItem("ITM002", "01", "Blades of Voth Domosh (Arcana Legion Commander)", 300300, 4, 8.233237, 47.329102));
         itemsSold.add(new GameItem("ITM003", "01", "Maw of Eztzhok (Immortal TI7 Bloodseeker)", 5500, 12, 14.604847, 13.886719));
-        itemsSold.add(new GameItem("ITM004", "01", "Chaos Fulcrum (Immortal TI7 Chaos Knight)", 3500, 844, 14.604847, 13.886719));
+        itemsSold.add(new GameItem("ITM004", "01", "Chaos Fulcrum (Immortal TI7 Chaos Knight)", 3500, 844, 61.606396, 253.828125));
         itemsSold.add(new GameItem("ITM005", "01", "Bitter Lineage (Immortal TI7 Troll Warlord)", 49700, 4, 14.604847, 13.886719));
     }
 

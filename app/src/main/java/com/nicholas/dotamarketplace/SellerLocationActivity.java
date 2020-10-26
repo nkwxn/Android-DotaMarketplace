@@ -4,6 +4,7 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.MenuItem;
 
@@ -18,6 +19,8 @@ public class SellerLocationActivity extends AppCompatActivity {
         ab = getSupportActionBar();
         ab.setTitle("Seller Location");
         ab.setDisplayHomeAsUpEnabled(true);
+
+        startActivity(new Intent(this, SellerLocationMapsActivity.class));
     }
 
     @Override

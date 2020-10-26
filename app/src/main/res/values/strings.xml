@@ -16,4 +16,11 @@
     <string name="dm_agree_to">I agree to the terms &amp; conditions</string>
     <string name="dm_clear_history">Clear History</string>
     <string name="dm_history">History</string>
+    <string name="title_activity_seller_location_maps">Seller Location</string>
+<!--    Google maps-->
+    <string name="normal_map">Normal map</string>
+    <string name="hybrid_map">Hybrid map</string>
+    <string name="satellite_map">Satellite map</string>
+    <string name="terrain_map">Terrain map</string>
+    <string name="no_map">No map</string>
 </resources>
