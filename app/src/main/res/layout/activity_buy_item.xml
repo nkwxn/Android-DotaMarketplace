@@ -20,6 +20,10 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:theme="@style/ThemeOverlay.MaterialComponents.Dark.ActionBar"
+            app:maxLines="3"
+            app:expandedTitleGravity="bottom|center_horizontal"
+            app:expandedTitleMarginStart="10dp"
+            app:expandedTitleMarginEnd="10dp"
             app:title="@string/app_name">
             <ImageView
                 android:id="@+id/imgItemB"
@@ -36,6 +40,17 @@
                 android:layout_height="?attr/actionBarSize"
                 app:layout_collapseMode="pin"
                 app:popupTheme="@style/ThemeOverlay.MaterialComponents.Dark"/>
+            <ImageView
+                android:layout_width="match_parent"
+                android:layout_height="120dp"
+                android:src="@drawable/bar_shade_bottom"
+                android:layout_gravity="bottom"/>
+            <ImageView
+                android:layout_width="match_parent"
+                android:layout_height="100dp"
+                android:fitsSystemWindows="true"
+                android:src="@drawable/bar_shade_top"
+                android:layout_gravity="top"/>
         </com.google.android.material.appbar.CollapsingToolbarLayout>
     </com.google.android.material.appbar.AppBarLayout>
     <androidx.core.widget.NestedScrollView
