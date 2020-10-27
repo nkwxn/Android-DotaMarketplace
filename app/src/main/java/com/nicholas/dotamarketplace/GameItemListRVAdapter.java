@@ -39,13 +39,9 @@ public class GameItemListRVAdapter extends RecyclerView.Adapter<GameItemListRVAd
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
         final GameItem itemV = gameItems.get(position);
         int resID;
-        final String itemId = itemV.getItemID();
-        final String userId = itemV.getUserID();
         final String itemFullName = itemV.getName();
         final int itemPrice = itemV.getPrice();
         final int itemStock = itemV.getStock();
-        final double latitude = itemV.getLatitude();
-        final double longitude = itemV.getLongitude();
 
         StringTokenizer namecatseparator = new StringTokenizer(itemFullName, "(");
         String itemName = namecatseparator.nextToken();
@@ -84,16 +80,6 @@ public class GameItemListRVAdapter extends RecyclerView.Adapter<GameItemListRVAd
             @Override
             public void onClick(View view) {
                 Intent i = new Intent(c, BuyItemActivity.class);
-                Bundle b = new Bundle();
-                b.putString("itemId", itemId);
-                b.putString("userId", userId);
-                b.putString("itemName", itemFullName);
-                b.putInt("itemPrice", itemPrice);
-                b.putInt("itemStock", itemStock);
-                b.putDouble("itemLattd", longitude);
-                b.putDouble("itemLongtd", latitude);
-                b.putInt("itemImg", resIDx);
-                i.putExtras(b);
                 i.putExtra("gameItem", itemV);
                 i.putExtra("itemImg", resIDx);
                 c.startActivity(i);

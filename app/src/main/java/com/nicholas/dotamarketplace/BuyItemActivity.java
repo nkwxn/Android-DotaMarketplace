@@ -42,7 +42,7 @@ public class BuyItemActivity extends AppCompatActivity implements View.OnClickLi
     Button btnLoc, btnCheckout;
     int itemPrice, itemStock, resID;
     double latd, longtd;
-    String userId, itemId;
+    long userId, itemId;
     Bundle b;
 
     private void initLayout() {
@@ -70,14 +70,14 @@ public class BuyItemActivity extends AppCompatActivity implements View.OnClickLi
 
         initLayout();
 
-        b = getIntent().getExtras();
-        String itemFullName = b.getString("itemName");
-        itemPrice = b.getInt("itemPrice", 0);
-        itemStock = b.getInt("itemStock", 0);
-        longtd = b.getDouble("itemLongtd", 0);
-        latd = b.getDouble("itemLattd", 0);
-        userId = b.getString("userId");
-        itemId = b.getString("itemId");
+        GameItem item = getIntent().getParcelableExtra("gameItem");
+        String itemFullName = item.getName();
+        itemPrice = item.getPrice();
+        itemStock = item.getStock();
+        longtd = item.getLongitude();
+        latd = item.getLatitude();
+        userId = item.getUserID();
+        itemId = item.getItemID();
 
         StringTokenizer namecatseparator = new StringTokenizer(itemFullName, "(");
         String itemName = namecatseparator.nextToken();

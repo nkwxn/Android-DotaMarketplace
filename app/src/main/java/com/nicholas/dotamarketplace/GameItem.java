@@ -4,11 +4,12 @@ import android.os.Parcel;
 import android.os.Parcelable;
 
 public class GameItem implements Parcelable {
-    private String itemID, userID, name;
+    private long itemID, userID;
+    private String name;
     private int price, stock;
     private double latitude, longitude;
 
-    public GameItem(String itemID, String userID, String name, int price, int stock, double latitude, double longitude) {
+    public GameItem(long itemID, long userID, String name, int price, int stock, double latitude, double longitude) {
         this.itemID = itemID;
         this.userID = userID;
         this.name = name;
@@ -19,8 +20,8 @@ public class GameItem implements Parcelable {
     }
 
     protected GameItem(Parcel in) {
-        itemID = in.readString();
-        userID = in.readString();
+        itemID = in.readLong();
+        userID = in.readLong();
         name = in.readString();
         price = in.readInt();
         stock = in.readInt();
@@ -40,11 +41,11 @@ public class GameItem implements Parcelable {
         }
     };
 
-    public String getItemID() {
+    public long getItemID() {
         return itemID;
     }
 
-    public void setItemID(String itemID) {
+    public void setItemID(long itemID) {
         this.itemID = itemID;
     }
 
@@ -88,11 +89,11 @@ public class GameItem implements Parcelable {
         this.longitude = longitude;
     }
 
-    public String getUserID() {
+    public long getUserID() {
         return userID;
     }
 
-    public void setUserID(String userID) {
+    public void setUserID(long userID) {
         this.userID = userID;
     }
 
@@ -103,9 +104,9 @@ public class GameItem implements Parcelable {
 
     @Override
     public void writeToParcel(Parcel parcel, int i) {
-        parcel.writeString(this.itemID);
-        parcel.writeString(this.itemID);
-        parcel.writeString(this.itemID);
+        parcel.writeLong(this.itemID);
+        parcel.writeLong(this.userID);
+        parcel.writeString(this.name);
         parcel.writeInt(this.price);
         parcel.writeInt(this.stock);
         parcel.writeDouble(this.latitude);

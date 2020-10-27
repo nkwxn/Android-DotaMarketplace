@@ -29,6 +29,7 @@ public class SQLiteDBHelper extends SQLiteOpenHelper {
     public static final String transaction_id = "TransactionID",
                                 transaction_user_id = "UserID",
                                 transaction_item_id = "ItemID",
+                                transaction_quantity = "TransactionQty",
                                 transaction_date = "TransactionDate";
 
     // Nama column untuk tabel transaction
@@ -75,6 +76,7 @@ public class SQLiteDBHelper extends SQLiteOpenHelper {
                 transaction_id + " INTEGER PRIMARY KEY AUTOINCREMENT, " +
                 transaction_user_id + " INTEGER NOT NULL, " +
                 transaction_item_id + " INTEGER NOT NULL, " +
+                transaction_quantity + " INTEGER NOT NULL, " +
                 transaction_date + " TEXT NOT NULL, " +
                 "FOREIGN KEY (" + transaction_user_id + ") " +
                 "REFERENCES " + TABLE_USER + " (" + user_id + "), " +
@@ -136,7 +138,12 @@ public class SQLiteDBHelper extends SQLiteOpenHelper {
     }
 
     // method untuk memasukkan data transaksi dan update stock dari inventory
-    public void makeTransaction(ContentValues cvTrans, ContentValues cvItems, ContentValues cvUser, long itemID, long userID) {
+    public void makeTransaction(int itemQty, long itemID, long userID) {
+        ContentValues cvTrans, cvItems, cvUser;
+        cvTrans = new ContentValues();
+        cvItems = new ContentValues();
+        cvUser = new ContentValues();
+
         database.insert(TABLE_TRANSACTION, null, cvTrans); // Memasukkan data transaksi
         database.update(TABLE_ITEM, cvItems, item_id + " = " + itemID, null); // memperbarui data item qty
         database.update(TABLE_USER, cvUser, user_id + " = " + userID, null); // memperbarui data saldo milik user
