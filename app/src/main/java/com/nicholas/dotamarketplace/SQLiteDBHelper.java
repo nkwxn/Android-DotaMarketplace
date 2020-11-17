@@ -8,6 +8,9 @@ import android.database.sqlite.SQLiteOpenHelper;
 
 import androidx.annotation.Nullable;
 
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
+
 public class SQLiteDBHelper extends SQLiteOpenHelper {
 
     // Nama Database dan Tabel
@@ -137,12 +140,55 @@ public class SQLiteDBHelper extends SQLiteOpenHelper {
         database.update(TABLE_USER, cv, user_id + " = " + userID, null);
     }
 
+    // Method untuk get item count
+    public int getItemCount() {
+        Cursor c = database.rawQuery("SELECT COUNT(*) " +
+                "FROM " + TABLE_ITEM, null);
+        c.moveToFirst();
+        return c.getInt(0);
+    }
+
+    // Method utk memasukkan data items ke db
+    public void insertGameItem() {
+
+    }
+
     // method untuk memasukkan data transaksi dan update stock dari inventory
     public void makeTransaction(int itemQty, long itemID, long userID) {
+        // Tanggal hari ini
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        Calendar cal = Calendar.getInstance(); // get now date and time
+        String trandate = sdf.format(cal.getTime());
+
         ContentValues cvTrans, cvItems, cvUser;
         cvTrans = new ContentValues();
         cvItems = new ContentValues();
         cvUser = new ContentValues();
+
+        cvTrans.put(transaction_user_id, userID);
+        cvTrans.put(transaction_item_id, itemID);
+        cvTrans.put(transaction_quantity, itemQty);
+        cvTrans.put(transaction_date, trandate);
+
+        // update jumlah stock barang
+        Cursor c = database.rawQuery("SELECT " + item_stock + ", " + item_price +
+                " FROM " + TABLE_ITEM + " WHERE " + item_id + " = " + itemID, null);
+        c.moveToFirst();
+        int cStock = c.getInt(0);
+        int updatedStock = cStock - itemQty;
+        cvItems.put(item_stock, updatedStock);
+
+        // update saldo user
+        Cursor cu = database.rawQuery
+                ("SELECT " + user_balance +
+                " FROM " + TABLE_USER +
+                " WHERE " + user_id + " = "
+                + userID, null);
+        cu.moveToFirst();
+        int cBalance = cu.getInt(0);
+        int totalPrice = c.getInt(1) * itemQty;
+        int updatedBalance = cBalance - totalPrice;
+        cvUser.put(user_balance, updatedBalance);
 
         database.insert(TABLE_TRANSACTION, null, cvTrans); // Memasukkan data transaksi
         database.update(TABLE_ITEM, cvItems, item_id + " = " + itemID, null); // memperbarui data item qty
