@@ -149,8 +149,14 @@ public class SQLiteDBHelper extends SQLiteOpenHelper {
     }
 
     // Method utk memasukkan data items ke db
-    public void insertGameItem() {
-
+    public void insertGameItem(String itemName, int price, int stock, double lattd, double longitd) {
+        ContentValues cvItem = new ContentValues();
+        cvItem.put(item_name, itemName);
+        cvItem.put(item_price, price);
+        cvItem.put(item_stock, stock);
+        cvItem.put(item_lat, lattd);
+        cvItem.put(item_long, longitd);
+        database.insert(TABLE_ITEM, null, cvItem);
     }
 
     // method untuk memasukkan data transaksi dan update stock dari inventory

@@ -19,6 +19,18 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.ListView;
 import android.widget.TextView;
+import android.widget.Toast;
+
+import com.android.volley.Request;
+import com.android.volley.RequestQueue;
+import com.android.volley.Response;
+import com.android.volley.VolleyError;
+import com.android.volley.toolbox.JsonArrayRequest;
+import com.android.volley.toolbox.Volley;
+
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.util.ArrayList;
 
@@ -26,8 +38,9 @@ public class MainFormActivity extends AppCompatActivity {
     ActionBar actionBar;
     TextView txtLoggedInUsername, txtLoggedInBalance;
     RecyclerView rvItems;
-    ArrayList<GameItem> itemsSold = new ArrayList<>();
+    ArrayList<GameItem> itemsSold;
     SQLiteDBHelper dbHelper;
+    RequestQueue requestQueue;
     long UserID;
 
     private void initComponents() {
@@ -36,6 +49,7 @@ public class MainFormActivity extends AppCompatActivity {
         txtLoggedInBalance = findViewById(R.id.txtUserBalance);
         rvItems = findViewById(R.id.rvItemsSold);
         dbHelper = new SQLiteDBHelper(this);
+        requestQueue = Volley.newRequestQueue(this);
     }
 
     private void initDatas() {
@@ -48,12 +62,60 @@ public class MainFormActivity extends AppCompatActivity {
         txtLoggedInUsername.setText(username);
         txtLoggedInBalance.setText("Rp " + balance);
 
-        ArrayList<GameItem> items = new ArrayList<>();
-        Cursor itemInfo = dbHelper.allItemsData(); // yang ini nanti aja buat data + validate json service
-        itemInfo.moveToFirst();
-        while (itemInfo.moveToNext()) {
-//            if ()
+        // Ambil data dari JSON Services ke Database SQLite
+        int itemCount = dbHelper.getItemCount();
+        if (itemCount == 0) {
+            String URL = "https://raw.githubusercontent.com/acad600/JSONRepository/master/ISYS6203/O212-ISYS6203-RM01-00-DotaMarketplace.json";
+            JsonArrayRequest jar = new JsonArrayRequest(Request.Method.GET, URL, null, new Response.Listener<JSONArray>() {
+                @Override
+                public void onResponse(JSONArray response) {
+                    try {
+                        for (int i = 0; i < response.length(); i++) {
+                            // get string names
+                            JSONObject item = response.getJSONObject(i);
+                            String name = item.getString("name");
+                            int price = item.getInt("price");
+                            int stock = item.getInt("stock");
+                            double getLongitd = item.getDouble("latitude");
+                            double getLatitd = item.getDouble("longitude");
+
+                            // insert to database
+                            dbHelper.insertGameItem(name, price, stock, getLatitd, getLongitd);
+                            initRV();
+                        }
+
+                    } catch (JSONException e) {
+                        Toast.makeText(MainFormActivity.this, "Request failed", Toast.LENGTH_SHORT).show();
+                        e.printStackTrace();
+                    }
+                }
+            }, new Response.ErrorListener() {
+                @Override
+                public void onErrorResponse(VolleyError error) {
+                    Toast.makeText(MainFormActivity.this, "Request failed", Toast.LENGTH_SHORT).show();
+                    error.printStackTrace();
+                }
+            });
+            requestQueue.add(jar);
         }
+    }
+
+    // game item from db to rv
+    public void initRV() {
+        itemsSold = new ArrayList<>();
+        Cursor itemInfo = dbHelper.allItemsData(); // yang ini nanti aja buat data + validate json service
+        while (itemInfo.moveToNext()) {
+            if (itemsSold.size() == 0) {
+                itemInfo.moveToFirst();
+            }
+            itemsSold.add(new GameItem(itemInfo.getInt(0), UserID, itemInfo.getString(1), itemInfo.getInt(2), itemInfo.getInt(3), itemInfo.getDouble(4), itemInfo.getDouble(5)));
+
+        }
+        GameItemListRVAdapter rvAdapter = new GameItemListRVAdapter(this, itemsSold);
+        StaggeredGridLayoutManager sglm = new StaggeredGridLayoutManager(2, StaggeredGridLayoutManager.VERTICAL);
+        rvItems.setAdapter(rvAdapter);
+        rvItems.setLayoutManager(sglm);
+
     }
 
     @Override
@@ -63,17 +125,6 @@ public class MainFormActivity extends AppCompatActivity {
 
         initComponents();
 
-        itemsSold.add(new GameItem(001, UserID, "Inscribed Demon Eater (Arcana Shadow Fiend)", 263300, 515, 14.604847, 13.886719));
-        itemsSold.add(new GameItem(002, UserID, "Blades of Voth Domosh (Arcana Legion Commander)", 300300, 4, 8.233237, 47.329102));
-        itemsSold.add(new GameItem(003, UserID, "Maw of Eztzhok (Immortal TI7 Bloodseeker)", 5500, 12, 14.604847, 13.886719));
-        itemsSold.add(new GameItem(004, UserID, "Chaos Fulcrum (Immortal TI7 Chaos Knight)", 3500, 844, 61.606396, 253.828125));
-        itemsSold.add(new GameItem(005, UserID, "Bitter Lineage (Immortal TI7 Troll Warlord)", 49700, 4, 14.604847, 13.886719));
-
-        // List View Adapter + kawan2 nya dari sini
-        GameItemListRVAdapter rvAdapter = new GameItemListRVAdapter(this, itemsSold);
-        StaggeredGridLayoutManager sglm = new StaggeredGridLayoutManager(2, StaggeredGridLayoutManager.VERTICAL);
-        rvItems.setAdapter(rvAdapter);
-        rvItems.setLayoutManager(sglm);
         rvItems.addItemDecoration(new SpacesItemDecoration(10, 0));
     }
 
@@ -81,6 +132,7 @@ public class MainFormActivity extends AppCompatActivity {
     protected void onResume() {
         super.onResume();
         initDatas();
+        initRV();
     }
 
     @Override
