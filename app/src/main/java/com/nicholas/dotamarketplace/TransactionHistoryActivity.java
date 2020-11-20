@@ -20,14 +20,13 @@ import android.widget.Toast;
 import java.util.ArrayList;
 
 public class TransactionHistoryActivity extends AppCompatActivity {
+    View llHistory, llNotFound;
     ActionBar ab;
     RecyclerView rvHistory;
     Button btnClear;
     ArrayList<TransactionHistory> tranHistory = new ArrayList<>();
-
-    public static int dpToPx(int dp) {
-        return (int) (dp * Resources.getSystem().getDisplayMetrics().density);
-    }
+    SQLiteDBHelper dbHelper;
+    long userID;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -39,20 +38,7 @@ public class TransactionHistoryActivity extends AppCompatActivity {
         ab.setDisplayHomeAsUpEnabled(true);
         ab.setTitle("Transaction History");
 
-        // will be replaced with a SQLite Data
-        tranHistory.add(new TransactionHistory("03", "01", "Bitter Lineage (Immortal TI7 Troll Warlord)",  "2020-10-05 11:35:01", 3, 149100));
-        tranHistory.add(new TransactionHistory("02", "01", "Inscribed Demon Eater (Arcana Shadow Fiend)", "2020-09-20 15:05:33", 5, 263300));
-        tranHistory.add(new TransactionHistory("01", "01", "Inscribed Demon Eater (Arcana Shadow Fiend)", "2020-09-20 13:50:05", 5, 263300));
-
-
-        // for the recyclerview
-        TransactionHistoryListRVAdapter rvAdapter = new TransactionHistoryListRVAdapter(this, tranHistory);
-
-        rvHistory.setHasFixedSize(true);
-        rvHistory.setAdapter(rvAdapter);
-        LinearLayoutManager llm = new LinearLayoutManager(this);
-        llm.setOrientation(LinearLayoutManager.VERTICAL);
-        rvHistory.setLayoutManager(llm);
+        initData();
 
         rvHistory.addItemDecoration(new SpacesItemDecoration(76, 1));
 
@@ -67,8 +53,8 @@ public class TransactionHistoryActivity extends AppCompatActivity {
                 builder.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialogInterface, int i) {
-                        tranHistory.clear();
-                        rvHistory.setAdapter(new TransactionHistoryListRVAdapter(TransactionHistoryActivity.this, tranHistory));
+                        dbHelper.deleteHistory(userID);
+                        initData();
                         Toast.makeText(TransactionHistoryActivity.this, "Transaction History is cleared", Toast.LENGTH_SHORT).show();
                     }
                 });
@@ -91,6 +77,27 @@ public class TransactionHistoryActivity extends AppCompatActivity {
         ab = getSupportActionBar();
         rvHistory = findViewById(R.id.rvHistory);
         btnClear = findViewById(R.id.btnClearHistory);
+        llHistory = findViewById(R.id.thereIsHistory);
+        llNotFound = findViewById(R.id.historyNotFound);
+        userID = getIntent().getLongExtra("user_id", 0);
+        dbHelper = new SQLiteDBHelper(getApplicationContext());
+    }
+
+    private void initData() {
+        tranHistory = dbHelper.allUserHistory(userID);
+
+        if (tranHistory.size() == 0) {
+            llNotFound.setVisibility(View.VISIBLE);
+            llHistory.setVisibility(View.GONE);
+        } else {
+            // for the recyclerview
+            TransactionHistoryListRVAdapter rvAdapter = new TransactionHistoryListRVAdapter(this, tranHistory);
+            rvHistory.setHasFixedSize(true);
+            rvHistory.setAdapter(rvAdapter);
+            LinearLayoutManager llm = new LinearLayoutManager(this);
+            llm.setOrientation(LinearLayoutManager.VERTICAL);
+            rvHistory.setLayoutManager(llm);
+        }
     }
 
     @Override

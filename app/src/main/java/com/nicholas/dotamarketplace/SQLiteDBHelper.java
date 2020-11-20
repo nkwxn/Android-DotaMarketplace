@@ -9,6 +9,7 @@ import android.database.sqlite.SQLiteOpenHelper;
 import androidx.annotation.Nullable;
 
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Calendar;
 
 public class SQLiteDBHelper extends SQLiteOpenHelper {
@@ -106,6 +107,15 @@ public class SQLiteDBHelper extends SQLiteOpenHelper {
         return c;
     }
 
+    public int countUserHistoryData(long UserID) {
+        Cursor c = database.rawQuery("SELECT COUNT(*) FROM " +
+                TABLE_TRANSACTION + " WHERE "
+                + transaction_user_id + " = " +
+                UserID, null);
+        c.moveToFirst();
+        return c.getInt(0);
+    }
+
     // method untuk mendapatkan semua data History
     public Cursor allHistoryUserData(long UserID) {
         Cursor c = database.rawQuery("SELECT * FROM " +
@@ -113,6 +123,31 @@ public class SQLiteDBHelper extends SQLiteOpenHelper {
                 + transaction_user_id + " = " +
                 UserID, null);
         return c;
+    }
+
+    public ArrayList<TransactionHistory> allUserHistory(long UserID) {
+        ArrayList<TransactionHistory> th = new ArrayList<>();
+        Cursor c = database.rawQuery("SELECT " + transaction_id + ", " +
+                item_name + ", " + transaction_date + ", " +
+                transaction_quantity + ", " + item_price +
+                " FROM " + TABLE_TRANSACTION +
+                " INNER JOIN " + TABLE_ITEM + " ON " +
+                TABLE_ITEM + "." + item_id + " = " +
+                TABLE_TRANSACTION + "." + transaction_item_id +
+                " WHERE " + transaction_user_id + " = " +
+                UserID, null);
+        while (c.moveToNext()) {
+            if (th.size() == 0) {
+                c.moveToFirst();
+            }
+            long transID = c.getLong(0);
+            String itemName = c.getString(1),
+                    tranDate = c.getString(2);
+            int tranQty = c.getInt(3),
+                    priceperpcs = c.getInt(4);
+            th.add(0, new TransactionHistory(transID, UserID, itemName,  tranDate, tranQty, priceperpcs));
+        }
+        return th;
     }
 
     // method untuk mendapatkan semua data Username + password

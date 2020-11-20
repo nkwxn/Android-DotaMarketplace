@@ -1,7 +1,8 @@
 package com.nicholas.dotamarketplace;
 
 public class TransactionHistory {
-    private String transID, userID, itemName, transDate;
+    private long transID, userID;
+    private String itemName, transDate;
     private int transQty;
 
     public int getItemPrice() {
@@ -14,7 +15,7 @@ public class TransactionHistory {
 
     private int itemPrice;
 
-    public TransactionHistory(String transID, String userID, String itemName, String transDate, int transQty, int itemPrice) {
+    public TransactionHistory(long transID, long userID, String itemName, String transDate, int transQty, int itemPrice) {
         this.transID = transID;
         this.userID = userID;
         this.itemName = itemName;
@@ -23,19 +24,19 @@ public class TransactionHistory {
         this.itemPrice = itemPrice;
     }
 
-    public String getTransID() {
+    public long getTransID() {
         return transID;
     }
 
-    public void setTransID(String transID) {
+    public void setTransID(long transID) {
         this.transID = transID;
     }
 
-    public String getUserID() {
+    public long getUserID() {
         return userID;
     }
 
-    public void setUserID(String userID) {
+    public void setUserID(long userID) {
         this.userID = userID;
     }
 

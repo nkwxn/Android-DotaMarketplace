@@ -179,13 +179,13 @@ public class BuyItemActivity extends AppCompatActivity implements View.OnClickLi
         Cursor cvaluserbal = dbHelper.getUsernameBalance(userId);
         cvaluserbal.moveToFirst();
         int currentBal = cvaluserbal.getInt(1);
-        int purchaseqty = Integer.parseInt(data);
-        int totalPrice = itemPrice * purchaseqty;
-        boolean vuserbalance = totalPrice > currentBal;
         if (etx.getText().toString().equals("")) {
             til.setError("must be filled");
             return false;
         } else if (etx.getId() == etxQty.getId()) {
+            int purchaseqty = Integer.parseInt(data);
+            int totalPrice = itemPrice * purchaseqty;
+            boolean vuserbalance = totalPrice > currentBal;
             if (purchaseqty <= 0) {
                 til.setError("cannot be zero");
                 return false;

@@ -54,7 +54,8 @@ public class TopUpActivity extends AppCompatActivity {
                     ContentValues cv = new ContentValues();
                     cv.put(dbHelper.user_balance, (bal + add) + "");
                     dbHelper.updateUserBalance(cv, UserID);
-
+                    etxTopUpAmt.setText("");
+                    etxPwd.setText("");
                     initDatas();
 
                     Toast.makeText(TopUpActivity.this, "Balance has been added by Rp " + add, Toast.LENGTH_SHORT).show();
