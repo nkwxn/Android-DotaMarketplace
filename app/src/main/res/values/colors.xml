@@ -3,6 +3,7 @@
     <color name="colorPrimary">#d32f2f</color>
     <color name="colorPrimaryVar">#9a0007</color>
     <color name="colorPrimaryDark">#9a0007</color>
+    <color name="colorHeaderDark">#d32f2f</color>
     <color name="colorSecondary">#ff9f00</color>
     <color name="colorSecondaryVar">#c67000</color>
     <color name="colorOnBackground">#000000</color>

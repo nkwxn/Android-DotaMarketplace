@@ -177,28 +177,29 @@ public class SQLiteDBHelper extends SQLiteOpenHelper {
         cvTrans.put(transaction_date, trandate);
 
         // update jumlah stock barang
-        Cursor c = database.rawQuery("SELECT " + item_stock + ", " + item_price +
-                " FROM " + TABLE_ITEM + " WHERE " + item_id + " = " + itemID, null);
-        c.moveToFirst();
-        int cStock = c.getInt(0);
+        Cursor cisp = itemStockPrice(itemID);
+        cisp.moveToFirst();
+        int cStock = cisp.getInt(0);
         int updatedStock = cStock - itemQty;
         cvItems.put(item_stock, updatedStock);
 
         // update saldo user
-        Cursor cu = database.rawQuery
-                ("SELECT " + user_balance +
-                " FROM " + TABLE_USER +
-                " WHERE " + user_id + " = "
-                + userID, null);
-        cu.moveToFirst();
-        int cBalance = cu.getInt(0);
-        int totalPrice = c.getInt(1) * itemQty;
+        Cursor cub = getUsernameBalance(userID);
+        cub.moveToFirst();
+        int cBalance = cub.getInt(1);
+        int totalPrice = cisp.getInt(1) * itemQty;
         int updatedBalance = cBalance - totalPrice;
         cvUser.put(user_balance, updatedBalance);
 
         database.insert(TABLE_TRANSACTION, null, cvTrans); // Memasukkan data transaksi
         database.update(TABLE_ITEM, cvItems, item_id + " = " + itemID, null); // memperbarui data item qty
         database.update(TABLE_USER, cvUser, user_id + " = " + userID, null); // memperbarui data saldo milik user
+    }
+
+    public Cursor itemStockPrice(long itemID) {
+        Cursor c = database.rawQuery("SELECT " + item_stock + ", " + item_price +
+                " FROM " + TABLE_ITEM + " WHERE " + item_id + " = " + itemID, null);
+        return c;
     }
 
     // method untuk menghapus semua history milik 1 user

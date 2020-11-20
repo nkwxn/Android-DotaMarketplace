@@ -8,6 +8,7 @@ import androidx.core.widget.NestedScrollView;
 
 import android.content.Intent;
 import android.content.res.Resources;
+import android.database.Cursor;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
@@ -40,10 +41,10 @@ public class BuyItemActivity extends AppCompatActivity implements View.OnClickLi
     TextInputLayout tilQty;
     ImageView img;
     Button btnLoc, btnCheckout;
+    SQLiteDBHelper dbHelper;
     int itemPrice, itemStock, resID;
     double latd, longtd;
     long userId, itemId;
-    Bundle b;
 
     private void initLayout() {
         parentV = findViewById(R.id.parentLayout);
@@ -61,6 +62,7 @@ public class BuyItemActivity extends AppCompatActivity implements View.OnClickLi
         tilQty = findViewById(R.id.tilQty);
         btnLoc = findViewById(R.id.btnLocation);
         btnCheckout = findViewById(R.id.btnCheckOut);
+        dbHelper = new SQLiteDBHelper(this);
     }
 
     @Override
@@ -70,14 +72,14 @@ public class BuyItemActivity extends AppCompatActivity implements View.OnClickLi
 
         initLayout();
 
-        GameItem item = getIntent().getParcelableExtra("gameItem");
-        String itemFullName = item.getName();
-        itemPrice = item.getPrice();
-        itemStock = item.getStock();
-        longtd = item.getLongitude();
-        latd = item.getLatitude();
-        userId = item.getUserID();
-        itemId = item.getItemID();
+        GameItem gitem = getIntent().getParcelableExtra("gameItem");
+        String itemFullName = gitem.getName();
+        itemPrice = gitem.getPrice();
+        itemStock = gitem.getStock();
+        longtd = gitem.getLongitude();
+        latd = gitem.getLatitude();
+        userId = gitem.getUserID();
+        itemId = gitem.getItemID();
 
         StringTokenizer namecatseparator = new StringTokenizer(itemFullName, "(");
         String itemName = namecatseparator.nextToken();
@@ -96,8 +98,6 @@ public class BuyItemActivity extends AppCompatActivity implements View.OnClickLi
         txtItemName.setText(itemDesc);
         txtItemPrice.setText("Price per unit: Rp " + itemPrice);
         txtItemStock.setText("Stock: " + itemStock);
-
-        abl.getLayoutParams().height = getScreenHeight() - getHeightOfView(llFields);
 
         resID = getIntent().getIntExtra("itemImg", 0);
         img.setImageResource(resID);
@@ -144,14 +144,14 @@ public class BuyItemActivity extends AppCompatActivity implements View.OnClickLi
         }
     }
 
-    private int getHeightOfView(View v) {
-        v.measure(View.MeasureSpec.UNSPECIFIED, View.MeasureSpec.UNSPECIFIED);
-        return v.getMeasuredHeight();
-    }
-
-    public int getScreenHeight() {
-        return Resources.getSystem().getDisplayMetrics().heightPixels;
-    }
+//    private int getHeightOfView(View v) {
+//        v.measure(View.MeasureSpec.UNSPECIFIED, View.MeasureSpec.UNSPECIFIED);
+//        return v.getMeasuredHeight();
+//    }
+//
+//    public int getScreenHeight() {
+//        return Resources.getSystem().getDisplayMetrics().heightPixels;
+//    }
 
     @Override
     public void onClick(View view) {
@@ -165,10 +165,10 @@ public class BuyItemActivity extends AppCompatActivity implements View.OnClickLi
             case R.id.btnCheckOut:
                 boolean valQty = validateFilled(tilQty, etxQty);
                 if (valQty) {
+                    int purchaseQty = Integer.parseInt(etxQty.getText().toString());
+                    dbHelper.makeTransaction(purchaseQty, itemId, userId);
                     Toast.makeText(this, "Transaction recorded", Toast.LENGTH_SHORT).show();
                     BuyItemActivity.this.finish();
-                } else {
-                    Toast.makeText(this, "Error!", Toast.LENGTH_SHORT).show();
                 }
                 break;
         }
@@ -176,16 +176,25 @@ public class BuyItemActivity extends AppCompatActivity implements View.OnClickLi
 
     private boolean validateFilled(TextInputLayout til, EditText etx) {
         String data = etx.getText().toString();
+        Cursor cvaluserbal = dbHelper.getUsernameBalance(userId);
+        cvaluserbal.moveToFirst();
+        int currentBal = cvaluserbal.getInt(1);
+        int purchaseqty = Integer.parseInt(data);
+        int totalPrice = itemPrice * purchaseqty;
+        boolean vuserbalance = totalPrice > currentBal;
         if (etx.getText().toString().equals("")) {
             til.setError("must be filled");
             return false;
         } else if (etx.getId() == etxQty.getId()) {
-            int qty = Integer.parseInt(data);
-            if (qty <= 0) {
+            if (purchaseqty <= 0) {
                 til.setError("cannot be zero");
                 return false;
-            } else if (itemStock < qty) {
+            } else if (itemStock < purchaseqty) {
                 til.setError("cannot be more than item stock");
+                return false;
+            } else if (vuserbalance) {
+                til.setError("insufficient balance");
+                Toast.makeText(this, "Balance: Rp " + currentBal + "\nInsufficient Balance", Toast.LENGTH_SHORT).show();
                 return false;
             } else {
                 til.setError(null);

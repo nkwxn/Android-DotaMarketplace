@@ -12,16 +12,15 @@
         android:id="@+id/appBarLayout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:weightSum="1"
-        android:theme="@style/AppTheme.AppBarOverlay"
+        android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar"
         android:fitsSystemWindows="true">
         <com.google.android.material.appbar.CollapsingToolbarLayout
             android:id="@+id/toolBarItemName"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:theme="@style/ThemeOverlay.MaterialComponents.Dark.ActionBar"
+            android:layout_height="wrap_content"
+            app:layout_scrollFlags="scroll|snap|exitUntilCollapsed"
+            app:contentScrim="@color/colorHeaderDark"
             app:maxLines="3"
-            app:expandedTitleGravity="bottom|center_horizontal"
             app:expandedTitleMarginStart="10dp"
             app:expandedTitleMarginEnd="10dp"
             app:title="@string/app_name">
@@ -29,17 +28,11 @@
                 android:id="@+id/imgItemB"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:scaleType="centerCrop"
-                android:fitsSystemWindows="true"
-                app:layout_collapseMode="parallax"
                 android:src="@drawable/ic_image_container"
-                android:contentDescription="TODO" />
-            <com.google.android.material.appbar.MaterialToolbar
-                android:id="@+id/toolbar"
-                android:layout_width="match_parent"
-                android:layout_height="?attr/actionBarSize"
-                app:layout_collapseMode="pin"
-                app:popupTheme="@style/ThemeOverlay.MaterialComponents.Dark"/>
+                android:fitsSystemWindows="true"
+                android:adjustViewBounds="true"
+                app:layout_collapseMode="parallax"
+                android:scaleType="centerCrop" />
             <ImageView
                 android:layout_width="match_parent"
                 android:layout_height="120dp"
@@ -49,15 +42,22 @@
                 android:layout_width="match_parent"
                 android:layout_height="100dp"
                 android:fitsSystemWindows="true"
+                app:layout_collapseMode="pin"
                 android:src="@drawable/bar_shade_top"
                 android:layout_gravity="top"/>
+            <com.google.android.material.appbar.MaterialToolbar
+                android:id="@+id/toolbar"
+                android:layout_width="match_parent"
+                android:layout_height="?attr/actionBarSize"
+                app:layout_collapseMode="pin"
+                app:popupTheme="@style/ThemeOverlay.AppCompat.Dark"/>
         </com.google.android.material.appbar.CollapsingToolbarLayout>
     </com.google.android.material.appbar.AppBarLayout>
     <androidx.core.widget.NestedScrollView
         android:id="@+id/nsv"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        app:layout_behavior="@string/appbar_scrolling_view_behavior">
+        app:layout_behavior="com.google.android.material.appbar.AppBarLayout$ScrollingViewBehavior">
         <LinearLayout
             android:id="@+id/layoutFields"
             android:layout_width="match_parent"
