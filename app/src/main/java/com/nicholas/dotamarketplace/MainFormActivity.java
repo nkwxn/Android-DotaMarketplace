@@ -7,6 +7,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import androidx.recyclerview.widget.StaggeredGridLayoutManager;
 
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.os.Bundle;
 import android.view.Menu;
@@ -48,7 +49,8 @@ public class MainFormActivity extends AppCompatActivity {
 
     private void initDatas() {
         // Set Username and Balance to TextView
-        UserID = Long.parseLong(getIntent().getStringExtra("user_id"));
+        SharedPreferences prefs = this.getSharedPreferences("rememberLogin", MODE_PRIVATE);
+        UserID = Long.parseLong(prefs.getString("loginUsername", ""));
         Cursor userInfo = dbHelper.getUsernameBalance(UserID);
         userInfo.moveToFirst();
         String username = userInfo.getString(0);
@@ -150,6 +152,11 @@ public class MainFormActivity extends AppCompatActivity {
                 startActivity(j);
                 break;
             case R.id.miLogOut:
+                // GET AUTO LOGIN AND CLEAR DATA
+                SharedPreferences prefs = this.getSharedPreferences("rememberLogin", MODE_PRIVATE);
+                SharedPreferences.Editor editor = prefs.edit();
+                editor.clear(); //RESET
+                editor.commit();
                 Intent k = new Intent(getApplicationContext(), LoginActivity.class);
                 startActivity(k);
                 this.finish();

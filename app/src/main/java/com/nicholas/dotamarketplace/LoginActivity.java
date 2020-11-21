@@ -67,6 +67,18 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
         btnLogin.setOnClickListener(this);
         btnRegister.setOnClickListener(this);
 
+        // AUTO LOGIN IF ALREADY LOGGED IN BEFORE
+        SharedPreferences prefs = this.getSharedPreferences("rememberLogin", MODE_PRIVATE);
+
+        String loginID = prefs.getString("loginUsername", "");
+        String loginPWD = prefs.getString("loginPassword", "");
+
+        if (loginID.length()>0 && loginPWD.length()>0) {
+            // REDIRECT TO MAINFORM IF ALREADY LOGGED IN BEFORE
+            Intent a = new Intent(getApplicationContext(), MainFormActivity.class);
+            startActivity(a);
+        }
+
         etxUsername.addTextChangedListener(new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
@@ -112,8 +124,13 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
                 boolean usrFilled = validateFilled(tilUsername, etxUsername);
                 boolean pwdFilled = validateFilled(tilPassword, etxPassword);
                 if (usrFilled  && pwdFilled) {
+                    // PUT USER DATA TO SHAREDPREF FOR AUTO LOGIN
+                    SharedPreferences userPrefs = this.getSharedPreferences("rememberLogin", MODE_PRIVATE);
+                    SharedPreferences.Editor editor = userPrefs.edit();
+                    editor.putString("loginUsername", user_id);
+                    editor.putString("loginPassword", String.valueOf(etxPassword));
+                    editor.commit();
                     Intent i = new Intent(getApplicationContext(), MainFormActivity.class);
-                    i.putExtra("user_id", user_id);
                     startActivity(i);
                     this.finish();
                 } else {
