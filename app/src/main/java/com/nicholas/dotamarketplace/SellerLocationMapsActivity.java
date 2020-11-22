@@ -8,6 +8,7 @@ import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
+import android.widget.Toast;
 
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
@@ -34,6 +35,8 @@ public class SellerLocationMapsActivity extends AppCompatActivity implements OnM
         latitude = getIntent().getDoubleExtra("lat", 0);
         longitude = getIntent().getDoubleExtra("long", 0);
 
+        Toast.makeText(this, "Latitude: " + latitude + "\nLongitude: " + longitude, Toast.LENGTH_SHORT).show();
+
         // Obtain the SupportMapFragment and get notified when the map is ready to be used.
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
                 .findFragmentById(R.id.map);
@@ -50,7 +53,7 @@ public class SellerLocationMapsActivity extends AppCompatActivity implements OnM
         mMap.moveCamera(CameraUpdateFactory.newLatLng(sellerloc));
 
         // Untuk melakukan zoom in maps
-        CameraPosition cps = new CameraPosition.Builder().target(sellerloc).zoom(15).bearing(0).tilt(0).tilt(0).build();
+        CameraPosition cps = new CameraPosition.Builder().target(sellerloc).zoom(10).bearing(0).tilt(0).tilt(0).build();
         mMap.animateCamera(CameraUpdateFactory.newCameraPosition(cps));
     }
 

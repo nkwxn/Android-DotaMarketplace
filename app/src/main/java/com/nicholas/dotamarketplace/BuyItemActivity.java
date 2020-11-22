@@ -158,8 +158,8 @@ public class BuyItemActivity extends AppCompatActivity implements View.OnClickLi
         switch (view.getId()) {
             case R.id.btnLocation:
                 Intent i = new Intent(getApplicationContext(), SellerLocationMapsActivity.class);
-                i.putExtra("long", latd );
-                i.putExtra("lat", longtd);
+                i.putExtra("long", longtd );
+                i.putExtra("lat", latd);
                 startActivity(i);
                 break;
             case R.id.btnCheckOut:
