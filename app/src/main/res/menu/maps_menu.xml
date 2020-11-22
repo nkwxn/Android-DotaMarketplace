@@ -21,9 +21,4 @@
         android:orderInCategory="103"
         app:showAsAction="never"
         android:title="@string/terrain_map"/>
-    <item
-        android:id="@+id/action_none"
-        android:orderInCategory="104"
-        app:showAsAction="never"
-        android:title="@string/no_map"/>
 </menu>

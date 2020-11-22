@@ -13,15 +13,13 @@
             android:label="@string/title_activity_seller_location_maps"></activity>
 
         <activity android:name=".TransactionHistoryActivity" />
-        <activity android:name=".SellerLocationActivity" />
         <activity android:name=".TopUpActivity" />
         <activity
             android:name=".BuyItemActivity"
             android:theme="@style/AppTheme.NoActionBar" />
         <activity android:name=".MainFormActivity" />
         <activity android:name=".RegisterActivity" />
-        <activity android:name=".LoginActivity"
-            android:noHistory="true">
+        <activity android:name=".LoginActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 

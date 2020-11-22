@@ -72,8 +72,8 @@ public class MainFormActivity extends AppCompatActivity {
                             String name = item.getString("name");
                             int price = item.getInt("price");
                             int stock = item.getInt("stock");
-                            double getLongitd = item.getDouble("latitude");
-                            double getLatitd = item.getDouble("longitude");
+                            double getLatitd = item.getDouble("latitude");
+                            double getLongitd = item.getDouble("longitude");
 
                             // insert to database
                             dbHelper.insertGameItem(name, price, stock, getLatitd, getLongitd);

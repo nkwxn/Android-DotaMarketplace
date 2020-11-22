@@ -71,12 +71,12 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
         SharedPreferences prefs = this.getSharedPreferences("rememberLogin", MODE_PRIVATE);
 
         String loginID = prefs.getString("loginUsername", "");
-        String loginPWD = prefs.getString("loginPassword", "");
 
-        if (loginID.length()>0 && loginPWD.length()>0) {
+        if (loginID.length() > 0) {
             // REDIRECT TO MAINFORM IF ALREADY LOGGED IN BEFORE
             Intent a = new Intent(getApplicationContext(), MainFormActivity.class);
             startActivity(a);
+            this.finish();
         }
 
         etxUsername.addTextChangedListener(new TextWatcher() {
@@ -128,7 +128,6 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
                     SharedPreferences userPrefs = this.getSharedPreferences("rememberLogin", MODE_PRIVATE);
                     SharedPreferences.Editor editor = userPrefs.edit();
                     editor.putString("loginUsername", user_id);
-                    editor.putString("loginPassword", String.valueOf(etxPassword));
                     editor.commit();
                     Intent i = new Intent(getApplicationContext(), MainFormActivity.class);
                     startActivity(i);

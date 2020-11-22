@@ -79,9 +79,6 @@ public class SellerLocationMapsActivity extends AppCompatActivity implements OnM
             case R.id.action_terrain:
                 mMap.setMapType(GoogleMap.MAP_TYPE_TERRAIN);
                 return true;
-            case R.id.action_none:
-                mMap.setMapType(GoogleMap.MAP_TYPE_NONE);
-                return true;
             default:
                 return super.onOptionsItemSelected(item);
         }
