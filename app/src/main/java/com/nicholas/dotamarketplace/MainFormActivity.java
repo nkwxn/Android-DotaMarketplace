@@ -6,10 +6,14 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.recyclerview.widget.StaggeredGridLayoutManager;
 
+import android.content.BroadcastReceiver;
+import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.os.Bundle;
+import android.telephony.SmsMessage;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -122,7 +126,33 @@ public class MainFormActivity extends AppCompatActivity {
         initComponents();
 
         rvItems.addItemDecoration(new SpacesItemDecoration(10, 0));
+
+        // Intent Filter buat terima SMS
+        IntentFilter filter = new IntentFilter();
+        filter.addAction("android.provider.Telephony.SMS_RECEIVED");
+        registerReceiver(brorec, filter);
     }
+
+    private BroadcastReceiver brorec = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            Bundle b = intent.getExtras();
+            SmsMessage[] smsMessages = null;
+
+            if (!b.isEmpty()) {
+                Object[] pdus = (Object[]) b.get("pdus");
+                smsMessages = new SmsMessage[pdus.length];
+                for (int i = 0; i < pdus.length; i++) {
+                    smsMessages[i] = SmsMessage.createFromPdu((byte[]) pdus[i]);
+                    String message = smsMessages[i].getMessageBody();
+                    String from = smsMessages[i].getOriginatingAddress();
+
+                    // Show notification on Toast
+                    Toast.makeText(getApplicationContext(), "New SMS from " + from + "\nContents:\n" + message, Toast.LENGTH_SHORT).show();
+                }
+            }
+        }
+    };
 
     @Override
     protected void onResume() {
