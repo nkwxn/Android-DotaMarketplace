@@ -13,9 +13,10 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
-import android.database.Cursor;
+import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.telephony.SmsMessage;
+import android.telephony.TelephonyManager;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -57,12 +58,9 @@ public class MainFormActivity extends AppCompatActivity {
         // Set Username and Balance to TextView
         SharedPreferences prefs = this.getSharedPreferences("rememberLogin", MODE_PRIVATE);
         UserID = Long.parseLong(prefs.getString("loginUsername", ""));
-        Cursor userInfo = dbHelper.getUsernameBalance(UserID);
-        userInfo.moveToFirst();
-        String username = userInfo.getString(0);
-        String balance = userInfo.getString(1);
-        txtLoggedInUsername.setText(username);
-        txtLoggedInBalance.setText("Rp " + balance);
+        String[] userandbalance = dbHelper.getUsernameBalance(UserID);
+        txtLoggedInUsername.setText(userandbalance[0]);
+        txtLoggedInBalance.setText("Rp " + userandbalance[1]);
 
         // Ambil data dari JSON Services ke Database SQLite
         int itemCount = dbHelper.getItemCount();
@@ -105,14 +103,7 @@ public class MainFormActivity extends AppCompatActivity {
     // game item from db to rv
     public void initRV() {
         itemsSold = new ArrayList<>();
-        Cursor itemInfo = dbHelper.allItemsData(); // yang ini nanti aja buat data + validate json service
-        while (itemInfo.moveToNext()) {
-            if (itemsSold.size() == 0) {
-                itemInfo.moveToFirst();
-            }
-            itemsSold.add(new GameItem(itemInfo.getInt(0), UserID, itemInfo.getString(1), itemInfo.getInt(2), itemInfo.getInt(3), itemInfo.getDouble(4), itemInfo.getDouble(5)));
-
-        }
+        itemsSold = dbHelper.allItemsData(UserID);
         GameItemListRVAdapter rvAdapter = new GameItemListRVAdapter(this, itemsSold);
         StaggeredGridLayoutManager sglm = new StaggeredGridLayoutManager(2, StaggeredGridLayoutManager.VERTICAL);
         rvItems.setAdapter(rvAdapter);
@@ -150,8 +141,23 @@ public class MainFormActivity extends AppCompatActivity {
                     String message = smsMessages[i].getMessageBody();
                     String from = smsMessages[i].getOriginatingAddress();
 
-                    // Show notification on Toast
-                    Toast.makeText(getApplicationContext(), "New SMS from " + from + "\nContents:\n" + message, Toast.LENGTH_SHORT).show();
+                    TelephonyManager tMgr = (TelephonyManager) getSystemService(Context.TELEPHONY_SERVICE);
+                    if (ActivityCompat.checkSelfPermission(getApplicationContext(), Manifest.permission.READ_SMS) != PackageManager.PERMISSION_GRANTED
+                            && ActivityCompat.checkSelfPermission(getApplicationContext(), Manifest.permission.READ_PHONE_NUMBERS) != PackageManager.PERMISSION_GRANTED
+                            && ActivityCompat.checkSelfPermission(getApplicationContext(), Manifest.permission.READ_PHONE_STATE) != PackageManager.PERMISSION_GRANTED) {
+                        Toast.makeText(context, "Please allow us sending SMS Services", Toast.LENGTH_SHORT).show();
+                        return;
+                    } else {
+                        String mPhoneNumber = tMgr.getLine1Number();
+
+                        // Show notification on Toast
+                        if (from.equals(mPhoneNumber) || from.equals(dbHelper.userPhoneNum(UserID))) {
+                            String phonenum = mPhoneNumber.equals("") ? dbHelper.userPhoneNum(UserID) : mPhoneNumber;
+                            Toast.makeText(getApplicationContext(), "Transaction has been recorded\nSMS Sent to phone number: " + phonenum, Toast.LENGTH_SHORT).show();
+                        } else {
+                            Toast.makeText(getApplicationContext(), "New SMS from " + from + "\n---Message:---\n" + message, Toast.LENGTH_SHORT).show();
+                        }
+                    }
                 }
             }
         }
@@ -200,6 +206,6 @@ public class MainFormActivity extends AppCompatActivity {
 
     private void requestSendReceiveSMS(){
         ActivityCompat.requestPermissions(this, new String[]{
-                Manifest.permission.RECEIVE_SMS, Manifest.permission.SEND_SMS},0);
+                Manifest.permission.RECEIVE_SMS, Manifest.permission.SEND_SMS, Manifest.permission.READ_PHONE_STATE, Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.INTERNET},0);
     }
 }

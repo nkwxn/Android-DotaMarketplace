@@ -8,6 +8,7 @@ import android.database.sqlite.SQLiteOpenHelper;
 
 import androidx.annotation.Nullable;
 
+import java.lang.reflect.Array;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -101,10 +102,18 @@ public class SQLiteDBHelper extends SQLiteOpenHelper {
     }
 
     // method untuk mendapatkan semua data Items
-    public Cursor allItemsData() {
+    public ArrayList<GameItem> allItemsData(long UserID) {
         Cursor c = database.rawQuery("SELECT * FROM " +
                 TABLE_ITEM, null);
-        return c;
+        ArrayList<GameItem> itemsSold = new ArrayList<>();
+        while (c.moveToNext()) {
+            if (itemsSold.size() == 0) {
+                c.moveToFirst();
+            }
+            itemsSold.add(new GameItem(c.getInt(0), UserID, c.getString(1), c.getInt(2), c.getInt(3), c.getDouble(4), c.getDouble(5)));
+
+        }
+        return itemsSold;
     }
 
     public int countUserHistoryData(long UserID) {
@@ -115,23 +124,18 @@ public class SQLiteDBHelper extends SQLiteOpenHelper {
         c.moveToFirst();
         return c.getInt(0);
     }
+
     // method untuk ambil user phone number
-    public Cursor userPhoneNum(long UserID){
+    public String userPhoneNum(long UserID){
         Cursor c = database.rawQuery("SELECT " +
                 user_phone_num + " FROM " + TABLE_USER + " WHERE " +
                 user_id + " = " + UserID, null);
-        return c;
+        c.moveToFirst();
+        String phoneNum = c.getString(0);
+        return phoneNum;
     }
 
     // method untuk mendapatkan semua data History
-    public Cursor allHistoryUserData(long UserID) {
-        Cursor c = database.rawQuery("SELECT * FROM " +
-                TABLE_TRANSACTION + " WHERE "
-                + transaction_user_id + " = " +
-                UserID, null);
-        return c;
-    }
-
     public ArrayList<TransactionHistory> allUserHistory(long UserID) {
         ArrayList<TransactionHistory> th = new ArrayList<>();
         Cursor c = database.rawQuery("SELECT " + transaction_id + ", " +
@@ -158,18 +162,46 @@ public class SQLiteDBHelper extends SQLiteOpenHelper {
     }
 
     // method untuk mendapatkan semua data Username + password
-    public Cursor allUsernameData() {
+    public ArrayList<ArrayList<String>> allUsernameData() {
+        ArrayList<ArrayList<String>> arr = new ArrayList<>();
         Cursor c = database.rawQuery("SELECT " + user_username +
                 ", " + user_pwd + ", " + user_id +
                 " FROM " + TABLE_USER, null);
-        return c;
+        ArrayList<String> user; // Urutan: UserID, Username, Password
+        while (c.moveToNext()) {
+            if (arr.size() == 0) {
+                c.moveToFirst();
+            }
+            user = new ArrayList<>();
+            user.add(c.getString(2));
+            user.add(c.getString(0));
+            user.add(c.getString(1));
+            arr.add(user);
+        }
+        return arr;
+    }
+
+    // Method buat menu register cm buat dapetin User ID nya
+    public ArrayList<String> allUsernames() {
+        ArrayList<ArrayList<String>> coreData = allUsernameData();
+        ArrayList<String> usernames = new ArrayList<>();
+        for (int i = 0; i < coreData.size(); i++) {
+            ArrayList<String> dataFromArray = coreData.get(i);
+            usernames.add(dataFromArray.get(1)); // Get username
+        }
+        return usernames;
     }
 
     // method untuk mendapatkan Username dan Balance setelah user login
-    public Cursor getUsernameBalance(long UserID) {
+    public String[] getUsernameBalance(long UserID) {
         Cursor c = database.rawQuery("SELECT " + user_username + ", " + user_balance + ", " + user_pwd +
                 " FROM " + TABLE_USER + " WHERE " + user_id + " = " + UserID, null);
-        return c;
+        c.moveToFirst();
+        String username = c.getString(0);
+        String balance = c.getString(1);
+        String password = c.getString(2);
+        String[] userbalance = {username, balance, password}; // array statis String, username: index 0, balance: index 1
+        return userbalance;
     }
 
     // method untuk memasukkan data user (sign up)
@@ -219,17 +251,15 @@ public class SQLiteDBHelper extends SQLiteOpenHelper {
         cvTrans.put(transaction_date, trandate);
 
         // update jumlah stock barang
-        Cursor cisp = itemStockPrice(itemID);
-        cisp.moveToFirst();
-        int cStock = cisp.getInt(0);
+        int[] cisp = itemStockPrice(itemID);
+        int cStock = cisp[0];
         int updatedStock = cStock - itemQty;
         cvItems.put(item_stock, updatedStock);
 
         // update saldo user
-        Cursor cub = getUsernameBalance(userID);
-        cub.moveToFirst();
-        int cBalance = cub.getInt(1);
-        int totalPrice = cisp.getInt(1) * itemQty;
+        String[] ub = getUsernameBalance(userID);
+        int cBalance = Integer.parseInt(ub[1]);
+        int totalPrice = cisp[1] * itemQty;
         int updatedBalance = cBalance - totalPrice;
         cvUser.put(user_balance, updatedBalance);
 
@@ -238,10 +268,12 @@ public class SQLiteDBHelper extends SQLiteOpenHelper {
         database.update(TABLE_USER, cvUser, user_id + " = " + userID, null); // memperbarui data saldo milik user
     }
 
-    public Cursor itemStockPrice(long itemID) {
+    public int[] itemStockPrice(long itemID) {
         Cursor c = database.rawQuery("SELECT " + item_stock + ", " + item_price +
                 " FROM " + TABLE_ITEM + " WHERE " + item_id + " = " + itemID, null);
-        return c;
+        c.moveToFirst();
+        int[] x = {c.getInt(0), c.getInt(1)}; // Index 0: Item stock, Index 1: Item price
+        return x;
     }
 
     // method untuk menghapus semua history milik 1 user

@@ -85,15 +85,7 @@ public class RegisterActivity extends AppCompatActivity implements View.OnClickL
         chkAgreement.setOnClickListener(this);
 
         // Cursor to get registered username data
-        Cursor cUsernames = dbHelper.allUsernameData();
-        cUsernames.moveToFirst();
-        while (cUsernames.moveToNext()) {
-            if (registeredUsernames.size() == 0) {
-                cUsernames.moveToFirst();
-            }
-            registeredUsernames.add(cUsernames.getString(0));
-        }
-        cUsernames.close();
+        registeredUsernames = dbHelper.allUsernames();
 
         etxFullName.addTextChangedListener(new TextWatcher() {
             @Override

@@ -115,10 +115,9 @@ public class TopUpActivity extends AppCompatActivity {
 
     private void initDatas() {
         UserID = getIntent().getLongExtra("user_id", 0);
-        Cursor userInfo = dbHelper.getUsernameBalance(UserID);
-        userInfo.moveToFirst();
-        balance = userInfo.getString(1);
-        usrpwd = userInfo.getString(2);
+        String[] userInfo = dbHelper.getUsernameBalance(UserID);
+        balance = userInfo[1];
+        usrpwd = userInfo[2];
         txtUserBalance.setText("Rp " + balance);
     }
 

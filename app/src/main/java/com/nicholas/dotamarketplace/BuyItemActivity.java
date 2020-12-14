@@ -177,30 +177,19 @@ public class BuyItemActivity extends AppCompatActivity implements View.OnClickLi
                     dbHelper.makeTransaction(purchaseQty, itemId, userId);
                     String message = "Your transaction for " + purchaseQty + " " + itemFullName + " with a total price of Rp " + (purchaseQty * itemPrice) + " was successful.";
 
-
                     Log.e(Build.FINGERPRINT, "Fingerprint: ");
                     Log.e(Build.BRAND, "Brand: ");
                     Log.e(Build.DEVICE, "Device: ");
                     Log.e(Build.MANUFACTURER, "Manufacturer: ");
                     Log.e(Build.MODEL, "Model: ");
                     Log.e(Build.PRODUCT, "Product: ");
-                    if (Build.FINGERPRINT.startsWith("generic")
-                            || Build.FINGERPRINT.startsWith("unknown")
-                            || Build.MODEL.contains("google_sdk")
-                            || Build.MODEL.contains("Emulator")
-                            || Build.MODEL.contains("Android SDK built for x86")
-                            || Build.MANUFACTURER.contains("Genymotion")
-                            || (Build.BRAND.startsWith("generic") && Build.DEVICE.startsWith("generic"))
-                            || "google_sdk".equals(Build.PRODUCT)){
+                    if (Build.FINGERPRINT.contains("generic")){
                         // EMULATOR
-
                         SmsManager.getDefault().sendTextMessage("5554", null, message, null, null);
                     }else{
-                        // REAL DEVICE
+                        // REAL DEVICE, MUST USE REAL PHONE NUMBER (USE YOUR OWN PHONE NUMBER)
                         SharedPreferences prefs = this.getSharedPreferences("rememberLogin", MODE_PRIVATE);
-                        Cursor c = dbHelper.userPhoneNum(userId);
-                        c.moveToFirst();
-                        String phoneNum = c.getString(0);
+                        String phoneNum = dbHelper.userPhoneNum(userId);
                         SmsManager.getDefault().sendTextMessage(phoneNum, null, message, null, null);
                     }
 
@@ -249,9 +238,8 @@ public class BuyItemActivity extends AppCompatActivity implements View.OnClickLi
 
     private boolean validateFilled(TextInputLayout til, EditText etx) {
         String data = etx.getText().toString();
-        Cursor cvaluserbal = dbHelper.getUsernameBalance(userId);
-        cvaluserbal.moveToFirst();
-        int currentBal = cvaluserbal.getInt(1);
+        String[] ub = dbHelper.getUsernameBalance(userId);
+        int currentBal = Integer.parseInt(ub[1]);
         if (etx.getText().toString().equals("")) {
             til.setError("must be filled");
             return false;

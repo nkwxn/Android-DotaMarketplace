@@ -42,18 +42,7 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
     // Import all registered user IDs
     private void initDatas() {
         registered = new ArrayList<>();
-        ArrayList<String> user; // Urutan: UserID, Username, Password
-        Cursor cUsers = dbHelper.allUsernameData();
-        while (cUsers.moveToNext()) {
-            if (registered.size() == 0) {
-                cUsers.moveToFirst();
-            }
-            user = new ArrayList<>();
-            user.add(cUsers.getString(2));
-            user.add(cUsers.getString(0));
-            user.add(cUsers.getString(1));
-            registered.add(user);
-        }
+        registered = dbHelper.allUsernameData();
     }
 
     @Override
