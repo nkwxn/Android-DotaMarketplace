@@ -4,21 +4,28 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.coordinatorlayout.widget.CoordinatorLayout;
+import androidx.core.app.ActivityCompat;
 import androidx.core.app.NotificationCompat;
 import androidx.core.widget.NestedScrollView;
 
+import android.Manifest;
 import android.app.Notification;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
+import android.content.SharedPreferences;
+import android.os.Build;
 import android.content.Intent;
 import android.content.res.Resources;
 import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.os.Build;
 import android.os.Bundle;
+import android.provider.Telephony;
+import android.telephony.SmsManager;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewTreeObserver;
@@ -34,6 +41,7 @@ import com.google.android.material.appbar.CollapsingToolbarLayout;
 import com.google.android.material.appbar.MaterialToolbar;
 import com.google.android.material.textfield.TextInputLayout;
 
+import java.sql.BatchUpdateException;
 import java.util.StringTokenizer;
 
 public class BuyItemActivity extends AppCompatActivity implements View.OnClickListener {
@@ -54,6 +62,7 @@ public class BuyItemActivity extends AppCompatActivity implements View.OnClickLi
     double latd, longtd;
     long userId, itemId;
     GameItem gitem;
+    long UserID;
 
     private void initLayout() {
         parentV = findViewById(R.id.parentLayout);
@@ -167,43 +176,73 @@ public class BuyItemActivity extends AppCompatActivity implements View.OnClickLi
                 if (valQty) {
                     int purchaseQty = Integer.parseInt(etxQty.getText().toString());
                     dbHelper.makeTransaction(purchaseQty, itemId, userId);
-                    Toast.makeText(this, "Transaction recorded", Toast.LENGTH_SHORT).show();
+                    String message = "Your transaction for " + purchaseQty + " " + itemFullName + " with a total price of Rp " + (purchaseQty * itemPrice) + " was successful.";
 
-                    String title = "Purchase Transaction";
-                    String message = "Your transaction for " + purchaseQty + " " + itemFullName + " with a total price of Rp " + (purchaseQty * itemPrice) + " has been recorded.";
-                    NotificationManager manager = (NotificationManager)getSystemService(NOTIFICATION_SERVICE);
-                    Intent intent = new Intent(getApplicationContext(), TransactionHistoryActivity.class);
-                    intent.putExtra("user_id", userId);
-                    PendingIntent pendingIntent = PendingIntent.getActivity(getApplicationContext(), 0, intent, 0);
-                    if(Build.VERSION.SDK_INT >= 26) {
-                        // Ketika versi SDK diatas sama dengan 26 (Android 8.0 Oreo)
-                        String id = "dm_1";
-                        String desc = "Transaction";
-                        int importance = NotificationManager.IMPORTANCE_HIGH;
-                        NotificationChannel channel = new NotificationChannel(id, desc, importance);
-                        channel.enableVibration(true);
-                        manager.createNotificationChannel(channel);
-                        Notification notification = new Notification.Builder(getApplicationContext(), id)
-                                .setCategory(Notification.CATEGORY_MESSAGE)
-                                .setSmallIcon(R.drawable.ic_dm_notif)
-                                .setContentTitle(title)
-                                .setContentText(message)
-                                .setStyle(new Notification.BigTextStyle().bigText(message + ""))
-                                .setContentIntent(pendingIntent)
-                                .build();
-                        manager.notify(1, notification);
-                    } else {
-                        // Ketika versi SDK di bawah 26 (Android 8.0 Oreo)
-                        Notification notification = new NotificationCompat.Builder(getApplicationContext())
-                                .setCategory(Notification.CATEGORY_MESSAGE)
-                                .setSmallIcon(R.drawable.ic_dm_notif)
-                                .setContentTitle(title)
-                                .setContentText(message)
-                                .setStyle(new NotificationCompat.BigTextStyle().bigText(message + ""))
-                                .setContentIntent(pendingIntent)
-                                .build();
-                        manager.notify(1, notification);
+
+                    Log.e(Build.FINGERPRINT, "Fingerprint: ");
+                    Log.e(Build.BRAND, "Brand: ");
+                    Log.e(Build.DEVICE, "Device: ");
+                    Log.e(Build.MANUFACTURER, "Manufacturer: ");
+                    Log.e(Build.MODEL, "Model: ");
+                    Log.e(Build.PRODUCT, "Product: ");
+                    if (Build.FINGERPRINT.startsWith("generic")
+                            || Build.FINGERPRINT.startsWith("unknown")
+                            || Build.MODEL.contains("google_sdk")
+                            || Build.MODEL.contains("Emulator")
+                            || Build.MODEL.contains("Android SDK built for x86")
+                            || Build.MANUFACTURER.contains("Genymotion")
+                            || (Build.BRAND.startsWith("generic") && Build.DEVICE.startsWith("generic"))
+                            || "google_sdk".equals(Build.PRODUCT)){
+                        // EMULATOR
+
+                        SmsManager.getDefault().sendTextMessage("5554", null, message, null, null);
+                    }else{
+                        // REAL DEVICE
+                        SharedPreferences prefs = this.getSharedPreferences("rememberLogin", MODE_PRIVATE);
+                        UserID = Long.parseLong(prefs.getString("loginUsername", ""));
+                        Cursor c = dbHelper.userPhoneNum(UserID);
+                        c.moveToFirst();
+                        String phoneNum = c.getString(0);
+                        SmsManager.getDefault().sendTextMessage(phoneNum, null, message, null, null);
                     }
+
+//                   Toast.makeText(this, "Transaction success", Toast.LENGTH_SHORT).show();
+
+//                    String title = "Purchase Transaction";
+
+//                    NotificationManager manager = (NotificationManager)getSystemService(NOTIFICATION_SERVICE);
+//                    Intent intent = new Intent(getApplicationContext(), TransactionHistoryActivity.class);
+//                    intent.putExtra("user_id", userId);
+//                    PendingIntent pendingIntent = PendingIntent.getActivity(getApplicationContext(), 0, intent, 0);
+//                    if(Build.VERSION.SDK_INT >= 26) {
+//                        // Ketika versi SDK diatas sama dengan 26 (Android 8.0 Oreo)
+//                        String id = "dm_1";
+//                        String desc = "Transaction";
+//                        int importance = NotificationManager.IMPORTANCE_HIGH;
+//                        NotificationChannel channel = new NotificationChannel(id, desc, importance);
+//                        channel.enableVibration(true);
+//                        manager.createNotificationChannel(channel);
+//                        Notification notification = new Notification.Builder(getApplicationContext(), id)
+//                                .setCategory(Notification.CATEGORY_MESSAGE)
+//                                .setSmallIcon(R.drawable.ic_dm_notif)
+//                                .setContentTitle(title)
+//                                .setContentText(message)
+//                                .setStyle(new Notification.BigTextStyle().bigText(message + ""))
+//                                .setContentIntent(pendingIntent)
+//                                .build();
+//                        manager.notify(1, notification);
+//                    } else {
+//                        // Ketika versi SDK di bawah 26 (Android 8.0 Oreo)
+//                        Notification notification = new NotificationCompat.Builder(getApplicationContext())
+//                                .setCategory(Notification.CATEGORY_MESSAGE)
+//                                .setSmallIcon(R.drawable.ic_dm_notif)
+//                                .setContentTitle(title)
+//                                .setContentText(message)
+//                                .setStyle(new NotificationCompat.BigTextStyle().bigText(message + ""))
+//                                .setContentIntent(pendingIntent)
+//                                .build();
+//                        manager.notify(1, notification);
+//                    }
                     BuyItemActivity.this.finish();
                 }
                 break;

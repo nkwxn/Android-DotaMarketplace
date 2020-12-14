@@ -115,6 +115,13 @@ public class SQLiteDBHelper extends SQLiteOpenHelper {
         c.moveToFirst();
         return c.getInt(0);
     }
+    // method untuk ambil user phone number
+    public Cursor userPhoneNum(long UserID){
+        Cursor c = database.rawQuery("SELECT " +
+                user_phone_num + " FROM " + TABLE_USER + " WHERE " +
+                user_id + " = " + UserID, null);
+        return c;
+    }
 
     // method untuk mendapatkan semua data History
     public Cursor allHistoryUserData(long UserID) {

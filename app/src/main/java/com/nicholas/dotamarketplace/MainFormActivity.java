@@ -3,9 +3,11 @@ package com.nicholas.dotamarketplace;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.ActivityCompat;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.recyclerview.widget.StaggeredGridLayoutManager;
 
+import android.Manifest;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
@@ -124,6 +126,7 @@ public class MainFormActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main_form);
 
         initComponents();
+        requestSendReceiveSMS();
 
         rvItems.addItemDecoration(new SpacesItemDecoration(10, 0));
 
@@ -193,5 +196,10 @@ public class MainFormActivity extends AppCompatActivity {
                 break;
         }
         return super.onOptionsItemSelected(item);
+    }
+
+    private void requestSendReceiveSMS(){
+        ActivityCompat.requestPermissions(this, new String[]{
+                Manifest.permission.RECEIVE_SMS, Manifest.permission.SEND_SMS},0);
     }
 }
