@@ -62,7 +62,6 @@ public class BuyItemActivity extends AppCompatActivity implements View.OnClickLi
     double latd, longtd;
     long userId, itemId;
     GameItem gitem;
-    long UserID;
 
     private void initLayout() {
         parentV = findViewById(R.id.parentLayout);
@@ -199,8 +198,7 @@ public class BuyItemActivity extends AppCompatActivity implements View.OnClickLi
                     }else{
                         // REAL DEVICE
                         SharedPreferences prefs = this.getSharedPreferences("rememberLogin", MODE_PRIVATE);
-                        UserID = Long.parseLong(prefs.getString("loginUsername", ""));
-                        Cursor c = dbHelper.userPhoneNum(UserID);
+                        Cursor c = dbHelper.userPhoneNum(userId);
                         c.moveToFirst();
                         String phoneNum = c.getString(0);
                         SmsManager.getDefault().sendTextMessage(phoneNum, null, message, null, null);
